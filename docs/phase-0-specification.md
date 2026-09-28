@@ -1,6 +1,6 @@
 # FallsFix — Phase 0 specification
 
-**Status:** Phase 0 planning deliverable retained as the design baseline. The owner subsequently approved Phase 1; see [development setup](development.md). No application, database, authentication, API, or deployment has been implemented. Policies below remain proposals for business validation.
+**Status:** Phase 0 planning deliverable retained as the design baseline. The owner subsequently approved Phases 1 and 2; see [development setup](development.md) and [current architecture](architecture.md). An application foundation now exists; database, authentication, business APIs, and deployment remain planned. Policies below remain proposals for business validation.
 
 ## 1. Business overview
 
@@ -59,7 +59,7 @@ Role-based access control (RBAC) means an operation requires an appropriate role
 
 ## 7. Functional requirements
 
-Requirement IDs provide stable references for later implementation tasks and tests. Everything in this table is planned.
+Requirement IDs provide stable references for later implementation tasks and tests. The business features in this table remain planned; the Phase 2 application foundation does not complete them.
 
 | ID | Requirement and observable acceptance condition |
 | --- | --- |

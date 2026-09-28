@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-paper: #f7f5ef;
+  --color-ink: #183e35;
+  --color-muted: #53675f;
+  --font-sans: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: #d3e4b1;
+  color: #183e35;
+}
+
+:focus-visible {
+  outline: 3px solid #426623;
+  outline-offset: 5px;
+}

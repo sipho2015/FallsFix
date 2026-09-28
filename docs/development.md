@@ -1,6 +1,6 @@
 # Development environment and Git workflow
 
-Phase 1 establishes the local repository and tooling baseline. No application, package manifest, dependencies, database, or npm scripts exist yet.
+Phase 1 established the local repository and tooling baseline. Phase 2 adds the Next.js application and npm scripts. Database setup remains planned.
 
 ## Verified local tools
 
@@ -12,9 +12,9 @@ The following commands ran successfully on the Windows PowerShell development ma
 | `node --version` | `v24.16.0` |
 | `npm --version` | `11.13.0` |
 
-Git records version history. Node.js will execute the JavaScript development/server tools. npm will install project dependencies and run defined project scripts starting in Phase 2.
+Git records version history. Node.js executes the JavaScript development/server tools. npm installs dependencies and runs the scripts in `package.json`.
 
-`.node-version` records the observed Node version for version managers that support this file; it does not install or switch Node by itself. No version manager is required. Framework compatibility and current security releases must be checked when choosing dependencies in Phase 2. These observed versions are not a claim that a future application has been tested against them.
+`.node-version` records the observed Node version for version managers that support this file; it does not install or switch Node by itself. No version manager is required. Phase 2 checks package compatibility and records exact dependencies in package.json and package-lock.json. Recheck compatibility and security advisories when updating them.
 
 ## Open and inspect the repository
 
@@ -28,9 +28,9 @@ node --version
 npm --version
 ```
 
-There is no GitHub remote yet. After a remote is deliberately created, document its actual clone URL here. Do not run `npm install`, migrations, or a development server now: there is no package manifest or application.
+There is no GitHub remote yet. After a remote is deliberately created, document its actual clone URL here. Run `npm ci` then `npm run dev` from the repository directory and open http://127.0.0.1:3000. Stop with Ctrl+C before building. Use `npm run dev -- --port 3001` if necessary.
 
-No environment variables are needed in this phase. Add a reviewed `.env.example` with placeholders when configuration is introduced, not invented credentials ahead of implementation. PostgreSQL and storage setup belong to their later phases.
+No environment variables are needed in this phase. The tracked `.env.example` documents that no configuration is required yet. PostgreSQL and storage setup belong to their later phases.
 
 ## Repository conventions
 
@@ -40,10 +40,10 @@ No environment variables are needed in this phase. Add a reviewed `.env.example`
 - Introduce `develop` only if a release process needs a separate integration branch.
 - Update README and affected documentation in the same change as the behavior or setup they describe.
 
-Example workflow after the initial baseline exists:
+Example workflow for a subsequent feature (choose a new branch name):
 
 ```powershell
-git switch -c feature/nextjs-foundation
+git switch -c feature/public-website
 git status --short
 git diff
 ```
@@ -54,7 +54,7 @@ This setup uses the developer's existing Git author configuration without changi
 
 ## File and secret hygiene
 
-`.editorconfig` requests UTF-8 text, two-space indentation, final newlines, and LF line endings in supporting editors. `.gitattributes` normalizes tracked text line endings across operating systems. These files improve consistency but do not replace a formatter or linter; choose those alongside the application in Phase 2.
+`.editorconfig` requests UTF-8 text, two-space indentation, final newlines, and LF line endings in supporting editors. `.gitattributes` normalizes tracked text line endings across operating systems. These files improve consistency but do not replace a formatter or linter; Phase 2 introduces ESLint with Next.js and TypeScript rules.
 
 `.gitignore` excludes environment files, private-key file types, local npm configuration, dependencies, generated output, logs, and machine-specific editor/deployment metadata. `.env.example` remains trackable so safe configuration instructions can be shared. Review it before every commit: an exception does not make its contents safe.
 
@@ -76,8 +76,26 @@ git diff --cached --check
 - Verify `.env.example`, source paths, documentation, and future `package-lock.json` remain trackable.
 - Verify documentation links, staged whitespace, committed file list, and clean final working tree.
 
-There is no code to lint, type-check, unit-test, or build. Those checks begin with Phase 2. No GitHub repository, branch protection, CI service, or deployment has been configured.
+Run `npm run check` for ESLint and strict TypeScript, then `npm run build` for a production build and `npm start` to serve it locally. Type checking generates route types before checking, including on a fresh checkout. Do not run dev and production builds concurrently in the same directory. No domain unit or end-to-end test suite exists yet. No GitHub repository, branch protection, CI service, or deployment has been configured.
+
+## Phase 2 verification
+
+- `npm ci --no-fund`: successfully reinstalled the locked dependency tree and reported zero known vulnerabilities.
+- `npm run dev -- --port 3101`: started successfully; HTTP homepage check passed after the lockfile reinstall.
+- `npm run check`: passed ESLint with zero warnings and strict TypeScript checking, including route-type generation before the first build.
+- `npm run build`: passed; homepage and not-found output prerendered successfully.
+- `npm start -- --port 3100`: production server started successfully on loopback.
+- HTTP checks passed for homepage 200, custom unknown-route 404, page content, linked generated Tailwind CSS, skip-link target, noindex metadata, security headers, and absence of `X-Powered-By`.
+- npm installation audit reported zero known vulnerabilities in the installed tree; dependency support limitations below still apply.
+- Documentation links, ignore rules, and whitespace were checked.
+- Browser connection returned no available browser. Responsive visual inspection, keyboard interactions, and client-side navigation have **not** been verified; carry these checks into Phase 3 when a browser is available. HTTP checks do not substitute for browser testing.
+
+Next.js generates `AGENTS.md` and `CLAUDE.md` on development startup. They are tracked to retain the framework's version-specific guidance rather than leaving recurring untracked files. `next-env.d.ts` and `.next` are generated local build/type artifacts and remain ignored.
+
+## Dependency maintenance note
+
+The Phase 2 dependency tree uses Next.js 16.3.6, React 19.3.0, TypeScript 5.9.3, and Tailwind 4.3.3. ESLint 9.39.5 installs with an upstream end-of-support warning. The React lint plugin used by `eslint-config-next` declares compatibility through ESLint 9, not ESLint 10, so this foundation does not force an incompatible major upgrade. Track upstream plugin compatibility and upgrade the lint toolchain together. This development-tool support limitation remains open; a zero-vulnerability npm audit is not a support guarantee.
 
 ## Next phase
 
-Phase 2 creates the minimal Next.js application, strict TypeScript configuration, styling foundation, lint/type-check/build scripts, and a package lockfile. Explain and verify the chosen versions then. Do not build the public website or portals during that foundation phase.
+Phase 3 builds the public website on the Phase 2 foundation. The current coming-soon page does not accept requests. Authentication, database operations, and portals remain later milestones.
