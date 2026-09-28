@@ -11,7 +11,7 @@ The public site explains FallsFix's planned service in Victoria Falls. It is a p
 | `/how-it-works` | Planned request-to-completion process and native expandable FAQs |
 | `/about` | Business purpose and intended operating principles, without invented operational statistics |
 | `/become-a-technician` | Planned network and verification expectations; applications not collected |
-| `/contact` | Victoria Falls starting area and explicit unpublished phone/email/hours |
+| `/contact` | Owner-provided phone/email links and hours: Monday–Friday and Sunday 08:00–17:00 CAT; Saturday closed |
 | `/request-service` | Booking availability explanation and preparation checklist; no submission |
 | `/request-service?service=plumbing` | Known category preview; unknown/repeated values safely fall back to general availability |
 | `/login`, `/register` | Account availability information; no credentials collected |
@@ -64,4 +64,6 @@ On the Phase 3 implementation, `npm run check` and `npm run build` passed. All f
 
 ## Before launch
 
-Confirm phone/WhatsApp, email, hours, service boundaries, and commercial policies. Implement the database, authentication, permissions, and real request workflow in their planned phases. Verify forms and privacy notices before collecting personal information. Only then replace availability notices with working operational flows.
+The owner supplied `siphomoyo893@gmail.com`, phone `+263 789 652 298`, and hours of 08:00–17:00 Monday–Friday and Sunday, with Saturday closed. The contact page publishes those details with `mailto:` and `tel:` links. WhatsApp availability has not been separately specified.
+
+Confirm service boundaries and commercial policies. Implement the database, authentication, permissions, and real request workflow in their planned phases. Verify forms and privacy notices before collecting personal information. Only then replace availability notices with working operational flows.

@@ -35,6 +35,7 @@ Exceptions and separate job, quote, invoice, and payment states are defined in t
 - Phase 0 planning documents.
 - Next.js App Router with React, strict TypeScript, Tailwind CSS, shared layout, and custom 404.
 - Public Home, Services, How It Works, About, Become a Technician, and Contact pages.
+- Owner-provided phone/email links and operating hours: Monday–Friday and Sunday, 08:00–17:00 CAT; Saturday closed.
 - Service catalogue search/group filters, mobile navigation, FAQs, loading/error states, and category previews.
 - Request Service, Login, and Register availability pages; no submissions or authentication yet.
 - HTTP smoke tests for public routes, links, category previews, and 404 handling.
@@ -86,7 +87,7 @@ app/
   page.tsx                        Public homepage
   services/, how-it-works/         Catalogue and process pages
   about/, become-a-technician/     Business and technician information
-  contact/                        Contact availability
+  contact/                        Phone/email links and operating hours
   request-service/                Category preview; no booking submission
   login/, register/               Account availability; no authentication
   loading.tsx, error.tsx           Route loading and retry states

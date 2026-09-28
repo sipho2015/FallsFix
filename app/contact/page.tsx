@@ -15,9 +15,8 @@ export default function ContactPage() {
         title="A local service. A human conversation."
       >
         <p>
-          Our support channels are being prepared alongside the service.
-          Verified contact details and operating hours will be published before
-          bookings open.
+          Get in touch by phone or email during our operating hours. FallsFix is
+          preparing to launch; online service bookings are not open yet.
         </p>
       </PageIntro>
       <div className="contact-grid">
@@ -30,22 +29,39 @@ export default function ContactPage() {
           </p>
         </section>
         <section className="contact-details">
-          <h2>Contact availability</h2>
+          <h2>Get in touch</h2>
           <dl>
             <div>
-              <dt>Phone & WhatsApp</dt>
-              <dd>Coming soon</dd>
+              <dt>Phone</dt>
+              <dd>
+                <a className="underline underline-offset-4" href="tel:+263789652298">
+                  +263 789 652 298
+                </a>
+              </dd>
             </div>
             <div>
               <dt>Email</dt>
-              <dd>Coming soon</dd>
+              <dd className="break-all">
+                <a className="underline underline-offset-4" href="mailto:siphomoyo893@gmail.com">
+                  siphomoyo893@gmail.com
+                </a>
+              </dd>
             </div>
             <div>
-              <dt>Operating hours</dt>
-              <dd>To be confirmed</dd>
+              <dt>Monday–Friday</dt>
+              <dd>08:00–17:00</dd>
+            </div>
+            <div>
+              <dt>Saturday</dt>
+              <dd>Closed</dd>
+            </div>
+            <div>
+              <dt>Sunday</dt>
+              <dd>08:00–17:00</dd>
             </div>
           </dl>
-          <p>We’re not collecting messages through this website yet.</p>
+          <p>All hours are in Victoria Falls local time (CAT, UTC+2).</p>
+          <p>Please use the phone or email links above. There is no online contact form yet.</p>
         </section>
       </div>
       <section className="section">
