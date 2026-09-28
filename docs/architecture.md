@@ -1,6 +1,6 @@
 # Application architecture
 
-Phase 2 introduced a single Next.js application using the App Router, React, strict TypeScript, and Tailwind CSS. Phase 3 adds the public prelaunch website. Database access, authentication, APIs, and portals remain planned.
+Phase 2 introduced a single Next.js application using the App Router, React, strict TypeScript, and Tailwind CSS. Phase 3 added public prelaunch pages; Phase 4 adds PostgreSQL and Prisma infrastructure. Authentication, business APIs, and portals remain planned.
 
 ## Files and request flow
 
@@ -18,7 +18,13 @@ Pages and static content are server components by default. The header and catalo
 
 `next.config.ts` disables the framework-identification response header and sets `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, and `Referrer-Policy: strict-origin-when-cross-origin`. These are baseline response protections, not authentication or a complete production security policy.
 
-There are no credentials, data writes, uploads, or protected resources yet. Local development/start commands bind to loopback. No environment values are required; `.env.example` documents that deliberately. Future secrets must stay server-side; `NEXT_PUBLIC_*` values are browser-visible.
+There are no public data-write endpoints, uploads, or protected customer resources yet. CLI migrations and seeds use local database credentials from ignored `.env`. Local app/database commands bind to loopback. Public pages do not use database credentials; future secrets must remain server-side because `NEXT_PUBLIC_*` values are browser-visible.
+
+## Database boundary
+
+`lib/database/db.ts` exports a lazy singleton behind `server-only`; trusted CLI scripts use the client factory directly. Prisma's generated client lives in ignored `generated/prisma`; type-check and build commands regenerate it. `prisma.config.ts` defines schema, migrations, seed, and CLI connection URLs. `prisma/schema.prisma` declares the core model, and the checked-in SQL migration adds supported PostgreSQL constraints plus a partial unique index for current assignments.
+
+The public catalogue remains an editorial preview. The seed reads its category names/descriptions and creates inactive database reference rows without overwriting existing edits. No public page reads job/user records yet. See [database design](database.md) for model boundaries, setup, and deferred entities.
 
 Metadata requests no indexing while this is a prelaunch website. This is a search-engine instruction, not access control. Revisit it when launch details are verified. Review CSP, HTTPS/HSTS, cookies, CSRF, authorization, caching, and rate limits when their relevant features or deployment exist rather than claiming they are solved here.
 

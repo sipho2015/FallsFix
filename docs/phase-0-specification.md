@@ -1,6 +1,6 @@
 # FallsFix — Phase 0 specification
 
-**Status:** Phase 0 planning deliverable retained as the design baseline. The owner subsequently approved Phases 1–3; see [development setup](development.md) and [current architecture](architecture.md). The foundation and public prelaunch pages exist; database, authentication, business APIs, and deployment remain planned. Policies below remain proposals for business validation.
+**Status:** Phase 0 planning deliverable retained as the design baseline. The owner subsequently approved Phases 1–4; see [development setup](development.md), [current architecture](architecture.md), and [database design](database.md). The public prelaunch pages and core database exist; authentication, business APIs, and deployment remain planned. Policies below remain proposals for business validation.
 
 ## 1. Business overview
 

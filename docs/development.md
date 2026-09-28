@@ -1,6 +1,6 @@
 # Development environment and Git workflow
 
-Phase 1 established the local repository and tooling baseline. Phase 2 added the Next.js application and npm scripts; Phase 3 adds public pages and HTTP smoke tests. Database setup remains planned.
+Phase 1 established the repository/tooling baseline. Phase 2 added the Next.js foundation, Phase 3 added public pages/HTTP smoke tests, and Phase 4 adds PostgreSQL/Prisma and integration tests. See [database setup](database.md).
 
 ## Verified local tools
 
@@ -30,7 +30,7 @@ npm --version
 
 There is no GitHub remote yet. After a remote is deliberately created, document its actual clone URL here. Run `npm ci` then `npm run dev` from the repository directory and open http://127.0.0.1:3000. Stop with Ctrl+C before building. Use `npm run dev -- --port 3001` if necessary.
 
-No environment variables are needed in this phase. The tracked `.env.example` documents that no configuration is required yet. PostgreSQL and storage setup belong to their later phases.
+The public website runs without environment values. Database commands require the variables in `.env.example`; follow [database setup](database.md) to generate local credentials or configure an existing server. Storage remains a later phase. Do not print or commit actual connection URLs.
 
 ## Repository conventions
 
@@ -94,8 +94,12 @@ Next.js generates `AGENTS.md` and `CLAUDE.md` on development startup. They are t
 
 ## Dependency maintenance note
 
+Phase 4 pins Prisma ORM/client/adapter 7.10.0. Its development tooling originally brought vulnerable `deepmerge-ts` and `mysql2` versions. Scoped overrides select `deepmerge-ts` 8.0.2 under `@prisma/config` and `mysql2` 3.24.4 under `prisma`. The deepmerge major release changes Map merging, but this project's Prisma configuration uses plain records; configuration, generation, migrations, and tests were checked with the patched version. FallsFix uses PostgreSQL, not the bundled MySQL tooling. Revisit the overrides when upgrading Prisma; do not remove them without auditing and testing the resulting tree.
+
+The patched installation reports zero known vulnerabilities. References: [DeepmergeTS 8 release/security changes](https://github.com/RebeccaStevens/deepmerge-ts/releases/tag/v8.0.0), [MySQL2 advisory](https://github.com/advisories/GHSA-rgwj-5xj2-c3m3).
+
 The Phase 2 dependency tree uses Next.js 16.3.6, React 19.3.0, TypeScript 5.9.3, and Tailwind 4.3.3. ESLint 9.39.5 installs with an upstream end-of-support warning. The React lint plugin used by `eslint-config-next` declares compatibility through ESLint 9, not ESLint 10, so this foundation does not force an incompatible major upgrade. Track upstream plugin compatibility and upgrade the lint toolchain together. This development-tool support limitation remains open; a zero-vulnerability npm audit is not a support guarantee.
 
 ## Next phase
 
-Phase 3 public pages are implemented, with browser verification still pending. Phase 4 will introduce PostgreSQL and Prisma after public-site verification. The site does not yet accept requests or account credentials. Authentication and portals remain later milestones.
+Phase 4 establishes the core database. Phase 5 will select an established authentication solution and add its required migration and account flows. The site does not yet accept requests or credentials. Public-site browser verification remains pending from Phase 3 and must still be completed before launch.

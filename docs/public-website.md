@@ -20,7 +20,7 @@ Every public page has a unique title, meaningful description, one main landmark,
 
 ## Content and architecture
 
-`data/services.ts` is an editorial preview of the Phase 0 categories. It is not a pricing table, database seed, or promise of technician availability. Phase 4 and the operational catalogue will replace availability decisions with database records. No prices, ratings, technician counts, or claims of an existing verified network are fabricated.
+`data/services.ts` is an editorial preview of the Phase 0 categories, not a pricing table or promise of technician availability. Phase 4's explicit seed reuses the category names/descriptions to create inactive database reference rows; public pages still do not query operational availability. No prices, ratings, technician counts, or claims of an existing verified network are fabricated.
 
 Pages and common content components render on the server. `SiteHeader` and `ServiceCatalogue` are client components because menu/search state needs browser interaction. Search/filter state is local to the page; it is not stored or sent to a service. Selecting a category links to the request availability page; the server matches a single query value against known slugs and never trusts arbitrary query content as a service name.
 
@@ -66,4 +66,4 @@ On the Phase 3 implementation, `npm run check` and `npm run build` passed. All f
 
 The owner supplied `siphomoyo893@gmail.com`, phone `+263 789 652 298`, and hours of 08:00–17:00 Monday–Friday and Sunday, with Saturday closed. The contact page publishes those details with `mailto:` and `tel:` links. WhatsApp availability has not been separately specified.
 
-Confirm service boundaries and commercial policies. Implement the database, authentication, permissions, and real request workflow in their planned phases. Verify forms and privacy notices before collecting personal information. Only then replace availability notices with working operational flows.
+Confirm service boundaries and commercial policies. The database foundation now exists; authentication, permissions, and the real request workflow remain planned. Verify forms and privacy notices before collecting personal information. Only then replace availability notices with working operational flows.
