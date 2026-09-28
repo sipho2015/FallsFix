@@ -2,7 +2,7 @@
 
 FallsFix is a planned local property-maintenance and service-management business, initially serving Victoria Falls, Zimbabwe. It will coordinate customers, verified technicians, service requests, quotations, invoices, and payment records.
 
-**Current stage: Phase 2 — Next.js application foundation. The public website and business features remain planned.**
+**Current stage: Phase 3 — public prelaunch website implemented; browser verification pending. Booking, accounts, and business operations remain planned.**
 
 ## Problem
 
@@ -33,7 +33,11 @@ Exceptions and separate job, quote, invoice, and payment states are defined in t
 ### Implemented
 
 - Phase 0 planning documents.
-- Next.js App Router foundation with React, strict TypeScript, Tailwind CSS, a coming-soon page, shared layout, and custom 404.
+- Next.js App Router with React, strict TypeScript, Tailwind CSS, shared layout, and custom 404.
+- Public Home, Services, How It Works, About, Become a Technician, and Contact pages.
+- Service catalogue search/group filters, mobile navigation, FAQs, loading/error states, and category previews.
+- Request Service, Login, and Register availability pages; no submissions or authentication yet.
+- HTTP smoke tests for public routes, links, category previews, and 404 handling.
 - Pinned dependencies, lockfile, lint/type-check/build commands, and basic response security headers.
 - Local Git repository on `main`, ignore rules, consistent text/editor settings, and a recorded Node version.
 - Verified local Git, Node.js, and npm commands; [development guide](docs/development.md).
@@ -44,7 +48,7 @@ Exceptions and separate job, quote, invoice, and payment states are defined in t
 
 ### Planned
 
-- Public website and customer, technician, and administrator portals.
+- Customer, technician, and administrator portals and operational public forms.
 - Authentication, server-side role and record ownership checks.
 - Service requests, assignment, status history, and restricted photo uploads.
 - Quotations, invoices, manual payment records, in-app notifications, and reviews.
@@ -79,14 +83,25 @@ eslint.config.mjs                 Next.js and TypeScript lint rules
 postcss.config.mjs                Tailwind build integration
 app/
   layout.tsx                      Shared document, header and footer
-  page.tsx                        Prelaunch notice
+  page.tsx                        Public homepage
+  services/, how-it-works/         Catalogue and process pages
+  about/, become-a-technician/     Business and technician information
+  contact/                        Contact availability
+  request-service/                Category preview; no booking submission
+  login/, register/               Account availability; no authentication
+  loading.tsx, error.tsx           Route loading and retry states
+  icon.svg                        Local favicon
   not-found.tsx                   Unknown-route page
   globals.css                     Tailwind and shared styles
+components/                       Shared public UI and interactive catalogue/navigation
+data/services.ts                  Planned editorial categories; not operational availability
+tests/public-site.test.mjs         HTTP smoke tests against a running server
 docs/
   phase-0-specification.md         Requirements, scope, workflows, architecture, roadmap
   business-rules.md                Proposed central operating and authorization policies
   development.md                  Verified tools, local setup and Git workflow
   architecture.md                 Implemented application architecture
+  public-website.md               Public routes, content limits and verification
 ```
 
 ## Getting started
@@ -102,7 +117,7 @@ Open `http://127.0.0.1:3000`. Stop with Ctrl+C; use `npm run dev -- --port 3001`
 
 ## Environment variables and scripts
 
-No environment variables are required; `.env.example` records this. Never commit secrets or put them in browser-visible `NEXT_PUBLIC_*` values.
+No environment variables are required to run the site. Optional `TEST_BASE_URL` selects the running server for HTTP tests (default `http://127.0.0.1:3100`). `.env.example` documents this test-only value. Never commit secrets or put them in browser-visible `NEXT_PUBLIC_*` values.
 
 | Command | Purpose |
 | --- | --- |
@@ -113,10 +128,11 @@ No environment variables are required; `.env.example` records this. Never commit
 | `npm run check` | Run lint and type checks |
 | `npm run build` | Create the production build |
 | `npm start` | Serve the existing production build locally |
+| `npm run test:smoke` | Check public routes on a running server (port 3100 by default) |
 
 ## Testing and security
 
-Run `npm run check` and `npm run build` before committing application changes. Check the homepage and an unknown route on the running server. No automated business test suite exists yet; introduce meaningful tests with the first domain behavior. See the development guide for verification evidence and limitations.
+Run `npm run check` and `npm run build`, then start `npm start -- --port 3100`. In another terminal, run `npm run test:smoke`. These tests exercise server-rendered pages and links; they do not execute client-side filters or mobile navigation. Browser visual and interaction verification remains pending because no browser connection is available. See [public website verification](docs/public-website.md). Domain tests will arrive with business operations.
 
 Basic security response headers are configured, the framework-identification header is disabled, and local servers bind to loopback. Authentication, server-side authorization, ownership checks, uploads, runtime validation, sessions, auditing, and rate limiting remain planned. Prelaunch metadata requests no indexing; this is not access control.
 
@@ -130,7 +146,7 @@ No API or deployed environment exists. Run `npm run build` then `npm start` for 
 - [ ] Validate proposed commercial and operational policies with the business owner.
 - [x] Phase 1: Local Git repository and development environment.
 - [x] Phase 2: Next.js foundation (visual browser verification remains unavailable).
-- [ ] Phase 3: Public website.
+- [ ] Phase 3: Public website — implemented; browser interaction and responsive visual verification pending.
 - [ ] Phases 4–6: Database, authentication, and RBAC.
 - [ ] Phases 7–12: Portals, job workflow/history, and uploads.
 - [ ] Phases 13–16: Quotations, invoices/payment records, notifications, and reviews.
@@ -140,7 +156,7 @@ The specification contains the full phase-by-phase roadmap. Security and testing
 
 ## Contributing
 
-Use small feature branches and descriptive commits, with checks and documentation updates alongside each change. Phase 2 uses `feature/nextjs-foundation` off `main`; see the [Git workflow](docs/development.md#repository-conventions). GitHub publishing remains pending. Phase 3 is the public website.
+Use small feature branches and descriptive commits, with checks and documentation updates alongside each change. Phase 3 uses `feature/public-website`, based on the committed Phase 2 branch; see the [Git workflow](docs/development.md#repository-conventions). GitHub publishing remains pending. Phase 4 introduces PostgreSQL and Prisma after public-site verification.
 
 ## License
 

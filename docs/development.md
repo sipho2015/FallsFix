@@ -1,6 +1,6 @@
 # Development environment and Git workflow
 
-Phase 1 established the local repository and tooling baseline. Phase 2 adds the Next.js application and npm scripts. Database setup remains planned.
+Phase 1 established the local repository and tooling baseline. Phase 2 added the Next.js application and npm scripts; Phase 3 adds public pages and HTTP smoke tests. Database setup remains planned.
 
 ## Verified local tools
 
@@ -76,7 +76,7 @@ git diff --cached --check
 - Verify `.env.example`, source paths, documentation, and future `package-lock.json` remain trackable.
 - Verify documentation links, staged whitespace, committed file list, and clean final working tree.
 
-Run `npm run check` for ESLint and strict TypeScript, then `npm run build` for a production build and `npm start` to serve it locally. Type checking generates route types before checking, including on a fresh checkout. Do not run dev and production builds concurrently in the same directory. No domain unit or end-to-end test suite exists yet. No GitHub repository, branch protection, CI service, or deployment has been configured.
+Run `npm run check` for ESLint and strict TypeScript, then `npm run build` for a production build and `npm start` to serve it locally. Type checking generates route types before checking, including on a fresh checkout. Do not run dev and production builds concurrently in the same directory. Stop servers before `npm ci`, which replaces dependency files. Phase 3 adds `npm run test:smoke` against a running server on port 3100; see [the public-site test instructions](public-website.md#verification). No domain unit or browser end-to-end suite exists yet. No GitHub repository, branch protection, CI service, or deployment has been configured.
 
 ## Phase 2 verification
 
@@ -98,4 +98,4 @@ The Phase 2 dependency tree uses Next.js 16.3.6, React 19.3.0, TypeScript 5.9.3,
 
 ## Next phase
 
-Phase 3 builds the public website on the Phase 2 foundation. The current coming-soon page does not accept requests. Authentication, database operations, and portals remain later milestones.
+Phase 3 public pages are implemented, with browser verification still pending. Phase 4 will introduce PostgreSQL and Prisma after public-site verification. The site does not yet accept requests or account credentials. Authentication and portals remain later milestones.

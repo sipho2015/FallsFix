@@ -1,12 +1,12 @@
-# Application foundation
+# Application architecture
 
-Phase 2 introduces a single Next.js application using the App Router, React, strict TypeScript, and Tailwind CSS. Database access, authentication, APIs, and portals remain planned.
+Phase 2 introduced a single Next.js application using the App Router, React, strict TypeScript, and Tailwind CSS. Phase 3 adds the public prelaunch website. Database access, authentication, APIs, and portals remain planned.
 
 ## Files and request flow
 
-A request to `/` is rendered using `app/layout.tsx` and `app/page.tsx`. The layout provides the document language, metadata, skip link, header, and footer. The page is an honest coming-soon notice, not the Phase 3 public website. Unknown routes render `app/not-found.tsx` with a home link.
+A request to `/` is rendered using `app/layout.tsx` and `app/page.tsx`. The layout provides document language, metadata, skip link, and shared header/footer components. The homepage introduces the planned service with links to public information pages. Unknown routes render `app/not-found.tsx` with a home link. See [public website](public-website.md) for the full route map.
 
-These components are server components by default: their rendering code runs on the server rather than requiring a client component for static text. Add a client boundary only when browser state or interaction requires it. Next.js still provides its own navigation/hydration runtime.
+Pages and static content are server components by default. The header and catalogue use client boundaries for menu state, current-route highlighting, and service filtering. The error boundary is also a client component. Next.js supplies navigation/hydration runtime. Editorial service data sits in `data/services.ts`; it does not establish operational availability. The request availability page awaits and validates category search parameters on the server.
 
 `app/globals.css` imports Tailwind and defines the small shared color/font foundation. `postcss.config.mjs` connects Tailwind's PostCSS plugin to the build. System fonts avoid external build-time font downloads. No component library is needed for this page.
 
@@ -20,7 +20,7 @@ These components are server components by default: their rendering code runs on 
 
 There are no credentials, data writes, uploads, or protected resources yet. Local development/start commands bind to loopback. No environment values are required; `.env.example` documents that deliberately. Future secrets must stay server-side; `NEXT_PUBLIC_*` values are browser-visible.
 
-Metadata requests no indexing while this is a prelaunch foundation. This is a search-engine instruction, not access control. Revisit it for the Phase 3 website. Review CSP, HTTPS/HSTS, cookies, CSRF, authorization, caching, and rate limits when their relevant features or deployment exist rather than claiming they are solved here.
+Metadata requests no indexing while this is a prelaunch website. This is a search-engine instruction, not access control. Revisit it when launch details are verified. Review CSP, HTTPS/HSTS, cookies, CSRF, authorization, caching, and rate limits when their relevant features or deployment exist rather than claiming they are solved here.
 
 ## Framework references
 
