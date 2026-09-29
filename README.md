@@ -2,7 +2,7 @@
 
 FallsFix is a planned local property-maintenance and service-management business, initially serving Victoria Falls, Zimbabwe. It will coordinate customers, verified technicians, service requests, quotations, invoices, and payment records.
 
-**Current stage: Phase 4 — PostgreSQL and Prisma database foundation. Public-site browser verification remains pending; booking, authentication, and business operations are not implemented.**
+**Current stage: Phase 5 — customer authentication implemented with verification, login/logout, sessions, and password recovery. Browser verification and actual SMTP delivery remain pending. Bookings, role-specific portals, and business operations are not implemented.**
 
 ## Problem
 
@@ -101,6 +101,7 @@ data/services.ts                  Planned editorial categories; not operational 
 tests/public-site.test.mjs         HTTP smoke tests against a running server
 tests/database.test.ts            Isolated PostgreSQL integrity tests
 lib/database/                     Server database entry point, client factory and test guard
+lib/auth/                         Auth configuration, library setup, strict request boundary and mail delivery
 prisma/                           Relational schema, SQL migration and reference seed
 scripts/                          Local PostgreSQL setup and test-database preparation
 docs/
@@ -110,6 +111,7 @@ docs/
   architecture.md                 Implemented application architecture
   public-website.md               Public routes, content limits and verification
   database.md                     Database model, setup, commands and security boundaries
+  authentication.md               Account flows, private email capture, tests and production configuration
 ```
 
 ## Getting started
@@ -121,7 +123,7 @@ npm ci
 npm run dev
 ```
 
-Open `http://127.0.0.1:3000`. Stop with Ctrl+C; use `npm run dev -- --port 3001` if port 3000 is occupied. The public pages still work without a running database. No remote is configured; an actual clone URL will be added after publication. See the [development guide](docs/development.md).
+Open `http://127.0.0.1:3000`. Stop with Ctrl+C; use `npm run dev -- --port 3001` if port 3000 is occupied. The public information pages still work without a running database. An `origin` remote is now configured in this checkout. See the [development guide](docs/development.md).
 
 For database development on Windows with PostgreSQL 18 installed:
 
@@ -134,6 +136,8 @@ npm run test:database
 ```
 
 The helper generates ignored local credentials and separate development, shadow, and test databases on loopback port 55433. It does not overwrite an existing `.env`. See [database setup](docs/database.md) for alternative paths, existing PostgreSQL servers, stopping/restarting the cluster, and environment configuration. Never point shadow/test URLs at the application database.
+
+For customer accounts, run `npm run auth:setup`, then `npm run dev` and open `/register`. Follow the verification link in the matching private `.local/auth-mail` file before logging in. Development emails are captured locally, not delivered. Read [authentication setup and production requirements](docs/authentication.md), including how to configure SMTP and the trusted proxy. Keep `BETTER_AUTH_URL` consistent with your exact browser origin. Production mode refuses local file delivery.
 
 ## Environment variables and scripts
 
@@ -154,16 +158,19 @@ Public pages require no environment values. Database operations use `DATABASE_UR
 | `npm run db:migrate -- --name change_name` | Create/apply a development migration using the shadow database |
 | `npm run db:seed` | Add reference categories/area without overwriting edits |
 | `npm run test:database` | Migrate the separate test DB and run transactional integrity tests |
+| `npm run auth:setup` | Generate missing private local auth settings without displaying secrets |
+| `npm run test:auth` | Test real auth handlers, cookies, recovery, rate limits, and security boundaries in the test DB |
+| `npm run test:auth:http` | Start an isolated Next dev server/test DB and verify the account flow over HTTP; stop your dev server first |
 
 ## Testing and security
 
-Run `npm run check` and `npm run build`, then start `npm start -- --port 3100`. In another terminal, run `npm run test:smoke`. Database changes also require `npm run test:database`; its fixtures roll back and never reset/drop a database. HTTP tests do not execute client-side filters or mobile navigation. Browser verification remains pending; see [public website verification](docs/public-website.md). Database tests validate integrity, not unimplemented authentication/RBAC or complete business workflows.
+Run `npm run check`, `npm run test:auth`, `npm run test:database`, and `npm run test:auth:http` with no development server running, then `npm run build`. Start `npm start -- --port 3100` and run `npm run test:smoke` in another terminal. Production previews of public pages need no SMTP, but account APIs remain unavailable until production configuration is complete. Tests never reset/drop a database. HTTP tests do not execute client-side forms, filters, or mobile navigation. Browser verification remains pending; see [public website verification](docs/public-website.md) and [authentication verification](docs/authentication.md#verification).
 
-Basic response headers are configured, local servers bind to loopback, and the database entry point is server-only. Generated credentials/local database files remain ignored. The local migration role is not a cluster administrator; production still needs a separate least-privilege runtime role. Authentication, authorization, ownership checks, uploads, runtime validation, sessions, auditing, and rate limiting remain planned. Prelaunch noindex is not access control. Patched transitive dependency overrides and the existing ESLint support limitation are explained in [development notes](docs/development.md#dependency-maintenance-note).
+Basic response headers are configured, local servers bind to loopback, and database/auth entry points are server-only. Better Auth supplies password hashing and session/token management; account inputs use strict Zod validation. Customer-only signup, verification, CSRF checks, rate limits, and suspension checks are implemented. Generated credentials, mail files, and local database files remain ignored. Role/ownership policies, uploads, business auditing, and production hardening remain planned. The local migration role is not a cluster administrator; production needs a separate least-privilege runtime role. Prelaunch noindex is not access control. Patched dependency overrides and the ESLint support limitation are explained in [development notes](docs/development.md#dependency-maintenance-note).
 
 ## API and deployment
 
-No API or deployed environment exists. Run `npm run build` then `npm start` for a local production server. Hosted deployment still requires appropriate network binding, HTTPS, monitoring, and later database/storage/backup and end-to-end checks. API contracts will be documented as implemented.
+Account APIs are documented in [authentication](docs/authentication.md#api-surface); no deployed environment is configured by this project. Run `npm run build` then `npm start` for a local production preview. Enabling production accounts requires HTTPS, SMTP, a trusted proxy/IP header, production secrets/database access, and delivery verification. Hosted deployment also requires monitoring, backups, and end-to-end checks.
 
 ## Roadmap
 
@@ -173,7 +180,9 @@ No API or deployed environment exists. Run `npm run build` then `npm start` for 
 - [x] Phase 2: Next.js foundation (visual browser verification remains unavailable).
 - [ ] Phase 3: Public website — implemented; browser interaction and responsive visual verification pending.
 - [x] Phase 4: PostgreSQL/Prisma core schema, migration, reference seed, and database integrity tests.
-- [ ] Phases 5–6: Authentication and RBAC.
+- [x] Phase 5: Customer authentication implementation and server integration tests.
+- [ ] Phase 5 release verification: browser interactions, actual SMTP delivery, and staging deployment checks.
+- [ ] Phase 6: Role/ownership authorization and protected role routing.
 - [ ] Phases 7–12: Portals, job workflow/history, and uploads.
 - [ ] Phases 13–16: Quotations, invoices/payment records, notifications, and reviews.
 - [ ] Phases 17–21: Reporting, hardening, expanded tests, deployment, and launch validation.
@@ -182,7 +191,7 @@ The specification contains the full phase-by-phase roadmap. Security and testing
 
 ## Contributing
 
-Use small feature branches and descriptive commits, with checks and documentation updates alongside each change. Phase 4 uses `feature/database-foundation`, based on the public-website branch. See the [Git workflow](docs/development.md#repository-conventions). GitHub publishing remains pending. Phase 5 will select and implement established authentication; the outstanding browser checks remain tracked separately.
+Use small feature branches and descriptive commits, with checks and documentation updates alongside each change. Phase 5 uses `feature/customer-authentication`, based on `feature/database-foundation`. An origin remote exists; this phase does not push or deploy changes. See the [Git workflow](docs/development.md#repository-conventions). Phase 6 will add centralized authorization; outstanding browser and SMTP checks remain tracked separately.
 
 ## License
 

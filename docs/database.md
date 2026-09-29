@@ -125,6 +125,8 @@ Additional checks confirmed zero users/jobs and only inactive reference rows in 
 
 ## Production boundary
 
+Phase 5 adds email verification state, library-managed Account/Session/Verification/RateLimit tables, and an atomic credential-customer provisioning trigger in a separate migration. See [authentication](authentication.md) for their responsibilities and additional tests. Historical Phase 4 checks above describe the earlier core-only schema; they do not replace Phase 5 verification.
+
 No hosted database, backup policy, restore drill, production credentials, or deployment is configured. The local owner role is suitable for development migrations, not the final least-privilege production application identity. Separate migration and runtime roles, configure trusted TLS/pooling, establish backup/restore procedures, and review security and authorization before real data collection.
 
 References: [Prisma 7 with Next.js](https://www.prisma.io/docs/guides/v7/frameworks/nextjs), [Prisma configuration](https://www.prisma.io/docs/orm/v7/reference/prisma-config-reference).

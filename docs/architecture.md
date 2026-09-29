@@ -1,6 +1,6 @@
 # Application architecture
 
-Phase 2 introduced a single Next.js application using the App Router, React, strict TypeScript, and Tailwind CSS. Phase 3 added public prelaunch pages; Phase 4 adds PostgreSQL and Prisma infrastructure. Authentication, business APIs, and portals remain planned.
+Phase 2 introduced a single Next.js application using the App Router, React, strict TypeScript, and Tailwind CSS. Phase 3 added public prelaunch pages; Phase 4 added PostgreSQL/Prisma. Phase 5 adds Better Auth customer authentication. Business APIs, role-specific authorization, and portals remain planned.
 
 ## Files and request flow
 
@@ -10,7 +10,7 @@ Pages and static content are server components by default. The header and catalo
 
 `app/globals.css` imports Tailwind and defines the small shared color/font foundation. `postcss.config.mjs` connects Tailwind's PostCSS plugin to the build. System fonts avoid external build-time font downloads. No component library is needed for this page.
 
-`tsconfig.json` enables strict checking and the `@/*` project-root alias. TypeScript checks code relationships but does not validate runtime user input; server input validation will arrive with forms. `next typegen` generates route types before `tsc --noEmit`, allowing type checks after a fresh dependency installation without first running the development server.
+`tsconfig.json` enables strict checking and the `@/*` project-root alias. TypeScript checks code relationships; shared Zod schemas validate account form inputs on both client and server. `next typegen` generates route types before `tsc --noEmit`, allowing type checks after a fresh dependency installation without first running the development server.
 
 `eslint.config.mjs` applies Next.js Core Web Vitals and TypeScript lint rules. Lint checks run explicitly and fail on warnings; a successful production build alone is not a lint result. Direct dependencies are pinned in `package.json`, with transitive versions/integrity in `package-lock.json`. Use `npm ci` to reproduce that dependency tree.
 
@@ -18,13 +18,13 @@ Pages and static content are server components by default. The header and catalo
 
 `next.config.ts` disables the framework-identification response header and sets `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, and `Referrer-Policy: strict-origin-when-cross-origin`. These are baseline response protections, not authentication or a complete production security policy.
 
-There are no public data-write endpoints, uploads, or protected customer resources yet. CLI migrations and seeds use local database credentials from ignored `.env`. Local app/database commands bind to loopback. Public pages do not use database credentials; future secrets must remain server-side because `NEXT_PUBLIC_*` values are browser-visible.
+Account write endpoints live behind the strict `/api/auth/[...all]` route boundary. It checks origin, input shape/body size, endpoint allowlist, and trusted IP forwarding before invoking Better Auth. Password hashing, signed cookies, token lifecycle, and database-backed rate limits use the library. A credential-account database trigger atomically provisions only CUSTOMER membership/profile. The protected account page checks session validity and current suspension/verification status on the server. See [authentication](authentication.md) for configuration, routes, tests, and limitations. There are no uploads or operational job-write endpoints yet. CLI migrations and seeds use ignored `.env`; local servers bind to loopback. Secrets stay server-side because `NEXT_PUBLIC_*` values are browser-visible.
 
 ## Database boundary
 
 `lib/database/db.ts` exports a lazy singleton behind `server-only`; trusted CLI scripts use the client factory directly. Prisma's generated client lives in ignored `generated/prisma`; type-check and build commands regenerate it. `prisma.config.ts` defines schema, migrations, seed, and CLI connection URLs. `prisma/schema.prisma` declares the core model, and the checked-in SQL migration adds supported PostgreSQL constraints plus a partial unique index for current assignments.
 
-The public catalogue remains an editorial preview. The seed reads its category names/descriptions and creates inactive database reference rows without overwriting existing edits. No public page reads job/user records yet. See [database design](database.md) for model boundaries, setup, and deferred entities.
+The public catalogue remains an editorial preview. The seed reads its category names/descriptions and creates inactive database reference rows without overwriting existing edits. Informational pages do not read job/user records; protected `/account` reads only the signed-in account. See [database design](database.md) for model boundaries, setup, and deferred entities.
 
 Metadata requests no indexing while this is a prelaunch website. This is a search-engine instruction, not access control. Revisit it when launch details are verified. Review CSP, HTTPS/HSTS, cookies, CSRF, authorization, caching, and rate limits when their relevant features or deployment exist rather than claiming they are solved here.
 

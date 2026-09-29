@@ -102,4 +102,4 @@ The Phase 2 dependency tree uses Next.js 16.3.6, React 19.3.0, TypeScript 5.9.3,
 
 ## Next phase
 
-Phase 4 establishes the core database. Phase 5 will select an established authentication solution and add its required migration and account flows. The site does not yet accept requests or credentials. Public-site browser verification remains pending from Phase 3 and must still be completed before launch.
+Phase 5 implements verified customer signup, login/logout, sessions, and password recovery using Better Auth. See [authentication setup](authentication.md) for private local email capture, production SMTP/proxy requirements, and integration tests. The checkout now has an origin remote; earlier "no remote" statements record the original foundation state. Phase 6 will add role/ownership policies and protected role routing. Bookings remain closed. Browser checks and actual SMTP delivery remain unverified and must be completed before launch.

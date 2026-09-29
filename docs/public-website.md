@@ -14,7 +14,9 @@ The public site explains FallsFix's planned service in Victoria Falls. It is a p
 | `/contact` | Owner-provided phone/email links and hours: Monday–Friday and Sunday 08:00–17:00 CAT; Saturday closed |
 | `/request-service` | Booking availability explanation and preparation checklist; no submission |
 | `/request-service?service=plumbing` | Known category preview; unknown/repeated values safely fall back to general availability |
-| `/login`, `/register` | Account availability information; no credentials collected |
+| `/login`, `/register` | Phase 5 customer login/registration forms; verification required |
+| `/forgot-password`, `/verify-email`, `/reset-password` | Phase 5 recovery and verification forms |
+| `/account` | Phase 5 protected account summary and sign out; anonymous visitors redirect to login |
 
 Every public page has a unique title, meaningful description, one main landmark, a main heading, shared navigation/footer, and a skip-link target. The mobile menu exposes expanded state and closes on selection; Escape inside the menu closes it and returns focus to its button. Search result counts use a polite status announcement. FAQ controls use native `details`/`summary`. A reduced-motion rule disables transitions. These are implemented accessibility measures, not a completed accessibility audit.
 
@@ -46,7 +48,7 @@ In another terminal:
 npm run test:smoke
 ```
 
-For a different test server, set `$env:TEST_BASE_URL = 'http://127.0.0.1:3101'` before the test command. Tests use Node's built-in runner and `fetch`; no test dependency was introduced. They check HTTP status, shared protections, unique titles, landmarks, noindex, non-collection of credentials, local navigation links, all category preview links, invalid/repeated query handling, and genuine 404 responses.
+For a different test server, set `$env:TEST_BASE_URL = 'http://127.0.0.1:3101'` before the test command. Tests use Node's built-in runner and `fetch`. They check HTTP status, shared protections, unique titles, landmarks, noindex, forms only on account routes, local navigation links, the anonymous account redirect, category preview links, invalid/repeated query handling, and genuine 404 responses. See [authentication tests](authentication.md#verification) for account behavior.
 
 Browser connection was attempted but no browser was available. The following remain unverified and are required before marking Phase 3 fully complete:
 
@@ -66,4 +68,4 @@ On the Phase 3 implementation, `npm run check` and `npm run build` passed. All f
 
 The owner supplied `siphomoyo893@gmail.com`, phone `+263 789 652 298`, and hours of 08:00–17:00 Monday–Friday and Sunday, with Saturday closed. The contact page publishes those details with `mailto:` and `tel:` links. WhatsApp availability has not been separately specified.
 
-Confirm service boundaries and commercial policies. The database foundation now exists; authentication, permissions, and the real request workflow remain planned. Verify forms and privacy notices before collecting personal information. Only then replace availability notices with working operational flows.
+Confirm service boundaries and commercial policies. The database and customer authentication now exist; role/ownership permissions and the real request workflow remain planned. Verify forms, SMTP delivery, deployment protections, and privacy notices before public personal-information collection. Only then replace booking availability notices with working operational flows.
