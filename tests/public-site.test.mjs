@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 const base = process.env.TEST_BASE_URL ?? "http://127.0.0.1:3100";
-const routes = ["/", "/services", "/how-it-works", "/about", "/become-a-technician", "/contact", "/request-service", "/login", "/register"];
+const authRoutes = ["/login", "/register", "/forgot-password", "/verify-email", "/reset-password"];
+const routes = ["/", "/services", "/how-it-works", "/about", "/become-a-technician", "/contact", "/request-service", ...authRoutes];
 
 test("public routes render unique titles, landmarks, and prelaunch safeguards", async () => {
   const titles = new Set();
@@ -18,7 +19,8 @@ test("public routes render unique titles, landmarks, and prelaunch safeguards", 
     assert.match(html, /id="main-content"/, route);
     assert.match(html, /name="robots" content="noindex/, route);
     assert.match(html, /Bookings are not open yet/, route);
-    assert.doesNotMatch(html, /type="password"|<form\b/, route);
+    if (authRoutes.includes(route)) assert.match(html, /<form\b/, route);
+    else assert.doesNotMatch(html, /type="password"|<form\b/, route);
     const title = html.match(/<title>(.*?)<\/title>/)?.[1];
     assert.ok(title, route);
     assert.ok(!titles.has(title), `Duplicate page title on ${route}`);
@@ -38,6 +40,16 @@ test("all public navigation and catalogue links resolve", async () => {
   assert.ok(links.size >= routes.length, "Expected public and service links");
   for (const href of links) {
     const response = await fetch(new URL(href, base), { redirect: "manual" });
+    if (href === "/account") {
+      if (response.status === 307) assert.equal(response.headers.get("location"), "/login");
+      else {
+        assert.equal(response.status, 200);
+        const html = await response.text();
+        assert.match(html, /<meta[^>]*http-equiv="refresh"[^>]*content="[^\"]*url=\/login"/);
+        assert.doesNotMatch(html, /Your account is ready/);
+      }
+      continue;
+    }
     assert.equal(response.status, 200, href);
   }
 });

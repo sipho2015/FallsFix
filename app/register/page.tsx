@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { AccountPreview } from "@/components/account-preview";
+import { AuthPage } from "@/components/auth-page";
 export const metadata: Metadata = {
-  title: "Registration coming soon",
+  title: "Create an account",
   description:
-    "Customer registration will open when accounts and service requests are ready.",
+    "Create and verify your FallsFix customer account.",
 };
 export default function RegisterPage() {
-  return <AccountPreview register />;
+  return <AuthPage mode="register" title="Start with a customer account." description="We use your name and email to manage your account. Verify your email before logging in. Creating an account does not submit a service request; bookings are not open yet." />;
 }

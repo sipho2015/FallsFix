@@ -64,11 +64,12 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link
-              href="/login"
+              href="/account"
+              prefetch={false}
               className="account-link"
               onClick={() => setOpen(false)}
             >
-              Log in
+              My account
             </Link>
             <Link
               href="/request-service"

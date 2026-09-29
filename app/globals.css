@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+.auth-panel { max-width: 34rem; margin: 2rem 0 4rem; }
+.auth-panel fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.auth-field { display: grid; gap: .5rem; margin-bottom: 1.25rem; }
+.auth-field label { font-weight: 650; }
+.auth-field input { width: 100%; border: 1px solid #727a80; border-radius: .4rem; padding: .85rem; background: white; color: #172c35; font: inherit; }
+.auth-field input:focus-visible { outline: 3px solid #146b58; outline-offset: 3px; }
+.auth-field input[aria-invalid="true"] { border-color: #a02b23; }
+.auth-error { color: #a02b23; }
+.auth-panel button { margin-top: 1rem; }
+.auth-panel button:disabled { opacity: .65; cursor: wait; }
+.auth-message { min-height: 1.5rem; margin-top: 1rem; }
+.auth-links { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; margin-top: 1rem; }
+.auth-links a { text-decoration: underline; text-underline-offset: .2em; }
+
 @theme inline {
   --color-paper: #f7f5ef;
   --color-ink: #183e35;

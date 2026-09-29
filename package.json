@@ -14,6 +14,9 @@
     "typecheck": "prisma generate && next typegen && tsc --noEmit",
     "check": "npm run lint && npm run typecheck",
     "test:smoke": "node --test tests/public-site.test.mjs",
+    "auth:setup": "node scripts/setup-auth.mjs",
+    "test:auth": "prisma generate && tsx scripts/prepare-test-database.ts && tsx --test tests/auth.test.ts",
+    "test:auth:http": "prisma generate && tsx scripts/prepare-test-database.ts && tsx --test tests/auth-http.test.ts",
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:deploy": "prisma migrate deploy",
@@ -25,12 +28,15 @@
   "dependencies": {
     "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "7.10.0",
+    "better-auth": "1.7.6",
     "dotenv": "18.0.4",
     "next": "16.3.6",
+    "nodemailer": "10.0.12",
     "pg": "8.23.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "server-only": "0.0.1"
+    "server-only": "0.0.1",
+    "zod": "4.6.5"
   },
   "overrides": {
     "@prisma/config": {
@@ -43,6 +49,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "24.19.0",
+    "@types/nodemailer": "8.0.2",
     "@types/pg": "8.23.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
