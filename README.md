@@ -2,7 +2,7 @@
 
 FallsFix is a planned local property-maintenance and service-management business, initially serving Victoria Falls, Zimbabwe. It will coordinate customers, verified technicians, service requests, quotations, invoices, and payment records.
 
-**Current stage: Phase 5 — customer authentication implemented with verification, login/logout, sessions, and password recovery. Browser verification and actual SMTP delivery remain pending. Bookings, role-specific portals, and business operations are not implemented.**
+**Current stage: Phase 6 — authentication, server-side role/ownership checks, and protected workspace entry pages implemented. Operational dashboards and bookings remain planned; browser and SMTP verification remain pending.** See [working progress](docs/progress.md) and [authorization](docs/authorization.md).
 
 ## Problem
 
@@ -161,12 +161,13 @@ Public pages require no environment values. Database operations use `DATABASE_UR
 | `npm run auth:setup` | Generate missing private local auth settings without displaying secrets |
 | `npm run test:auth` | Test real auth handlers, cookies, recovery, rate limits, and security boundaries in the test DB |
 | `npm run test:auth:http` | Start an isolated Next dev server/test DB and verify the account flow over HTTP; stop your dev server first |
+| `npm run test:authorization` | Verify role isolation, job ownership, technician assignment access, and revocation |
 
 ## Testing and security
 
 Run `npm run check`, `npm run test:auth`, `npm run test:database`, and `npm run test:auth:http` with no development server running, then `npm run build`. Start `npm start -- --port 3100` and run `npm run test:smoke` in another terminal. Production previews of public pages need no SMTP, but account APIs remain unavailable until production configuration is complete. Tests never reset/drop a database. HTTP tests do not execute client-side forms, filters, or mobile navigation. Browser verification remains pending; see [public website verification](docs/public-website.md) and [authentication verification](docs/authentication.md#verification).
 
-Basic response headers are configured, local servers bind to loopback, and database/auth entry points are server-only. Better Auth supplies password hashing and session/token management; account inputs use strict Zod validation. Customer-only signup, verification, CSRF checks, rate limits, and suspension checks are implemented. Generated credentials, mail files, and local database files remain ignored. Role/ownership policies, uploads, business auditing, and production hardening remain planned. The local migration role is not a cluster administrator; production needs a separate least-privilege runtime role. Prelaunch noindex is not access control. Patched dependency overrides and the ESLint support limitation are explained in [development notes](docs/development.md#dependency-maintenance-note).
+Database/auth entry points are server-only. Better Auth handles passwords and sessions; Zod validates account inputs. Customer-only signup, verification, CSRF checks, rate limits, suspension checks, role guards, and job-read ownership policies are implemented. Uploads, business auditing, mutation-specific permissions, and production hardening remain planned. Secrets/local files stay ignored. Production needs a least-privilege runtime database role. Prelaunch noindex is not access control. See [authorization](docs/authorization.md) and [dependency maintenance notes](docs/development.md#dependency-maintenance-note).
 
 ## API and deployment
 
@@ -182,7 +183,7 @@ Account APIs are documented in [authentication](docs/authentication.md#api-surfa
 - [x] Phase 4: PostgreSQL/Prisma core schema, migration, reference seed, and database integrity tests.
 - [x] Phase 5: Customer authentication implementation and server integration tests.
 - [ ] Phase 5 release verification: browser interactions, actual SMTP delivery, and staging deployment checks.
-- [ ] Phase 6: Role/ownership authorization and protected role routing.
+- [x] Phase 6: Role/ownership read authorization and protected role routing; mutation policies arrive with their workflows.
 - [ ] Phases 7–12: Portals, job workflow/history, and uploads.
 - [ ] Phases 13–16: Quotations, invoices/payment records, notifications, and reviews.
 - [ ] Phases 17–21: Reporting, hardening, expanded tests, deployment, and launch validation.
@@ -191,7 +192,7 @@ The specification contains the full phase-by-phase roadmap. Security and testing
 
 ## Contributing
 
-Use small feature branches and descriptive commits, with checks and documentation updates alongside each change. Phase 5 uses `feature/customer-authentication`, based on `feature/database-foundation`. An origin remote exists; this phase does not push or deploy changes. See the [Git workflow](docs/development.md#repository-conventions). Phase 6 will add centralized authorization; outstanding browser and SMTP checks remain tracked separately.
+Use small feature branches and descriptive commits, with checks and documentation alongside changes. Phase 6 uses `feature/role-authorization`, based on `feature/customer-authentication`. An origin remote exists; this phase does not push or deploy changes. See the [Git workflow](docs/development.md#repository-conventions). Phase 7 adds the customer portal; browser and SMTP checks remain tracked separately.
 
 ## License
 

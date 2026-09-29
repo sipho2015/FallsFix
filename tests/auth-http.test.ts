@@ -54,6 +54,7 @@ test("Next.js serves registration, verification mail, protected account and logo
     assert.ok(ready, "The isolated Next server must be ready");
     const anonymous = await fetch(`${origin}/account`, { redirect: "manual" });
     await assertLoginRedirect(anonymous);
+    await assertLoginRedirect(await fetch(`${origin}/portal/admin`, { redirect: "manual" }));
     assert.equal((await post("sign-up/email", { name: "HTTP Test Customer", email: address, password })).status, 200);
     let verificationUrl = "";
     for (let attempt = 0; attempt < 30 && !verificationUrl; attempt++) {
@@ -77,6 +78,35 @@ test("Next.js serves registration, verification mail, protected account and logo
     const account = await fetch(`${origin}/account`, { headers: { cookie } });
     assert.equal(account.status, 200);
     assert.match(await account.text(), /HTTP Test Customer/);
+    const portal = (role: string) => fetch(`${origin}/portal/${role}`, { headers: { cookie }, redirect: "manual" });
+    const allowed = async (role: string, title: string) => {
+      const response = await portal(role);
+      assert.equal(response.status, 200);
+      assert.match(await response.text(), new RegExp(`<h1[^>]*>${title}</h1>`));
+    };
+    const denied = async (role: string) => {
+      const response = await portal(role);
+      assert.ok([200, 404].includes(response.status));
+      const html = await response.text();
+      assert.match(html, /Page not found/);
+      assert.doesNotMatch(html, /<h1[^>]*>(Customer|Technician|Administrator) workspace<\/h1>/);
+    };
+    await allowed("customer", "Customer workspace");
+    await denied("admin");
+    await denied("technician");
+    await denied("unknown");
+    const fixtureUser = await database.user.findUniqueOrThrow({ where: { email: address } });
+    await database.userRole.create({ data: { userId: fixtureUser.id, role: "ADMIN" } });
+    await allowed("admin", "Administrator workspace");
+    await database.userRole.delete({ where: { userId_role: { userId: fixtureUser.id, role: "ADMIN" } } });
+    await denied("admin");
+    await database.userRole.create({ data: { userId: fixtureUser.id, role: "TECHNICIAN" } });
+    await database.technicianProfile.create({ data: { userId: fixtureUser.id } });
+    await denied("technician");
+    await database.technicianProfile.update({ where: { userId: fixtureUser.id }, data: { isActive: true, verificationStatus: "VERIFIED", verifiedAt: new Date(), verifiedById: fixtureUser.id } });
+    await allowed("technician", "Technician workspace");
+    await database.technicianProfile.update({ where: { userId: fixtureUser.id }, data: { isActive: false } });
+    await denied("technician");
     assert.equal((await post("sign-out", {}, cookie)).status, 200);
     const loggedOut = await fetch(`${origin}/account`, { headers: { cookie }, redirect: "manual" });
     await assertLoginRedirect(loggedOut);
@@ -90,6 +120,7 @@ test("Next.js serves registration, verification mail, protected account and logo
       await database.verification.deleteMany({ where: { value: user.id } });
       await database.userRole.deleteMany({ where: { userId: user.id } });
       await database.customerProfile.deleteMany({ where: { userId: user.id } });
+      await database.technicianProfile.deleteMany({ where: { userId: user.id } });
       await database.user.delete({ where: { id: user.id } });
     }
     await database.rateLimit.deleteMany({ where: { key: { contains: clientIp } } });

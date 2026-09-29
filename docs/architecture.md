@@ -1,6 +1,6 @@
 # Application architecture
 
-Phase 2 introduced a single Next.js application using the App Router, React, strict TypeScript, and Tailwind CSS. Phase 3 added public prelaunch pages; Phase 4 added PostgreSQL/Prisma. Phase 5 adds Better Auth customer authentication. Business APIs, role-specific authorization, and portals remain planned.
+Phase 2 introduced Next.js, React, TypeScript, and Tailwind. Phase 3 added public pages, Phase 4 PostgreSQL/Prisma, and Phase 5 Better Auth. Phase 6 adds [server-side role/ownership guards and protected workspace entry pages](authorization.md). Business APIs and operational dashboards remain planned.
 
 ## Files and request flow
 

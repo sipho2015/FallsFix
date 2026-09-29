@@ -68,4 +68,4 @@ On the Phase 3 implementation, `npm run check` and `npm run build` passed. All f
 
 The owner supplied `siphomoyo893@gmail.com`, phone `+263 789 652 298`, and hours of 08:00–17:00 Monday–Friday and Sunday, with Saturday closed. The contact page publishes those details with `mailto:` and `tel:` links. WhatsApp availability has not been separately specified.
 
-Confirm service boundaries and commercial policies. The database and customer authentication now exist; role/ownership permissions and the real request workflow remain planned. Verify forms, SMTP delivery, deployment protections, and privacy notices before public personal-information collection. Only then replace booking availability notices with working operational flows.
+Confirm service boundaries and commercial policies. The database, authentication, and role/ownership read guards exist; operational dashboards and the request workflow remain planned. Verify forms, SMTP delivery, deployment protections, and privacy notices before public personal-information collection. Only then replace booking availability notices with working operational flows.

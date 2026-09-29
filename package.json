@@ -17,6 +17,7 @@
     "auth:setup": "node scripts/setup-auth.mjs",
     "test:auth": "prisma generate && tsx scripts/prepare-test-database.ts && tsx --test tests/auth.test.ts",
     "test:auth:http": "prisma generate && tsx scripts/prepare-test-database.ts && tsx --test tests/auth-http.test.ts",
+    "test:authorization": "prisma generate && tsx scripts/prepare-test-database.ts && tsx --test tests/authorization.test.ts",
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:deploy": "prisma migrate deploy",

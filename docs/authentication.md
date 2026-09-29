@@ -92,4 +92,4 @@ The browser skill was retried during Phase 5; no connected browser was available
 - [Rate limiting and IP trust](https://better-auth.com/docs/concepts/rate-limit)
 - [Next.js integration](https://better-auth.com/docs/integrations/next)
 
-Phase 6 will add centralized role/ownership enforcement and protected role-specific routing. It is not implemented by this phase.
+Phase 6 now supplies [centralized role/ownership read enforcement and protected workspace routing](authorization.md). Operational dashboards and mutation policies remain for subsequent phases.
