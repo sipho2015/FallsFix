@@ -84,34 +84,26 @@ tsconfig.json                     Strict TypeScript settings
 eslint.config.mjs                 Next.js and TypeScript lint rules
 postcss.config.mjs                Tailwind build integration
 prisma.config.ts                  Migration, datasource and seed configuration
-app/
-  layout.tsx                      Shared document, header and footer
-  page.tsx                        Public homepage
-  services/, how-it-works/         Catalogue and process pages
-  about/, become-a-technician/     Business and technician information
-  contact/                        Phone/email links and operating hours
-  request-service/                Category preview; no booking submission
-  login/, register/               Account availability; no authentication
-  loading.tsx, error.tsx           Route loading and retry states
-  icon.svg                        Local favicon
-  not-found.tsx                   Unknown-route page
-  globals.css                     Tailwind and shared styles
-components/                       Shared public UI and interactive catalogue/navigation
-data/services.ts                  Planned editorial categories; not operational availability
-tests/public-site.test.mjs         HTTP smoke tests against a running server
-tests/database.test.ts            Isolated PostgreSQL integrity tests
-lib/database/                     Server database entry point, client factory and test guard
-lib/auth/                         Auth configuration, library setup, strict request boundary and mail delivery
-prisma/                           Relational schema, SQL migration and reference seed
-scripts/                          Local PostgreSQL setup and test-database preparation
-docs/
-  phase-0-specification.md         Requirements, scope, workflows, architecture, roadmap
-  business-rules.md                Proposed central operating and authorization policies
-  development.md                  Verified tools, local setup and Git workflow
-  architecture.md                 Implemented application architecture
-  public-website.md               Public routes, content limits and verification
-  database.md                     Database model, setup, commands and security boundaries
-  authentication.md               Account flows, private email capture, tests and production configuration
+src/
+  app/                            Next.js routing and shared document
+    (public)/                     Public website pages
+    (auth)/                       Login, registration, verification and recovery
+    (portal)/                     Protected account and role workspaces
+    api/                          Thin HTTP route handlers
+  frontend/
+    components/                   Reusable UI and browser interactions
+    styles/                       Tailwind and global styles
+  backend/
+    auth/                         Authentication and email delivery
+    authorization/                Role and ownership policies
+    database/                     Database connection and test safety guard
+  shared/
+    data/                         Editorial service catalogue shared with seeding
+    validation/                   Client/server input schemas
+prisma/                           Database schema, SQL migrations and reference seed
+tests/                            HTTP, authentication, permissions and database tests
+scripts/                          Local setup and test-database preparation
+docs/                             Architecture, setup, policies and progress
 ```
 
 ## Getting started

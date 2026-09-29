@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { createDatabaseClient } from "../lib/database/create-client";
+import { createDatabaseClient } from "../src/backend/database/create-client";
 import { seedReferenceData } from "./seed-data";
 
 async function main() {

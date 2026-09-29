@@ -22,7 +22,7 @@ Every public page has a unique title, meaningful description, one main landmark,
 
 ## Content and architecture
 
-`data/services.ts` is an editorial preview of the Phase 0 categories, not a pricing table or promise of technician availability. Phase 4's explicit seed reuses the category names/descriptions to create inactive database reference rows; public pages still do not query operational availability. No prices, ratings, technician counts, or claims of an existing verified network are fabricated.
+`src/shared/data/services.ts` is an editorial preview of the Phase 0 categories, not a pricing table or promise of technician availability. Phase 4's explicit seed reuses the category names/descriptions to create inactive database reference rows; public pages still do not query operational availability. No prices, ratings, technician counts, or claims of an existing verified network are fabricated.
 
 Pages and common content components render on the server. `SiteHeader` and `ServiceCatalogue` are client components because menu/search state needs browser interaction. Search/filter state is local to the page; it is not stored or sent to a service. Selecting a category links to the request availability page; the server matches a single query value against known slugs and never trusts arbitrary query content as a service name.
 

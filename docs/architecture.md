@@ -4,13 +4,17 @@ Phase 2 introduced Next.js, React, TypeScript, and Tailwind. Phase 3 added publi
 
 ## Files and request flow
 
-A request to `/` is rendered using `app/layout.tsx` and `app/page.tsx`. The layout provides document language, metadata, skip link, and shared header/footer components. The homepage introduces the planned service with links to public information pages. Unknown routes render `app/not-found.tsx` with a home link. See [public website](public-website.md) for the full route map.
+Application source is grouped under `src/`: `app` owns Next.js web/API entry points, `frontend` owns UI/styles, `backend` owns authentication/permissions/database access, and `shared` owns browser-safe schemas and reference data. Route groups `(public)`, `(auth)`, and `(portal)` organize pages without changing URLs. They share one root layout. Prisma schema/migrations stay in root `prisma/`; tests, scripts, configuration, and environment files retain their dedicated root locations. New business services belong in `src/backend/services/` when implemented; no empty placeholder modules are needed. Static assets belong in root `public/`, while framework metadata such as `icon.svg` remains in `src/app`.
 
-Pages and static content are server components by default. The header and catalogue use client boundaries for menu state, current-route highlighting, and service filtering. The error boundary is also a client component. Next.js supplies navigation/hydration runtime. Editorial service data sits in `data/services.ts`; it does not establish operational availability. The request availability page awaits and validates category search parameters on the server.
+Frontend/shared imports cannot reach backend or generated database code; lint rules enforce this separation. Backend code does not import UI or route entry points. HTTP route files delegate to backend modules. Database/auth server entry points retain their `server-only` markers.
 
-`app/globals.css` imports Tailwind and defines the small shared color/font foundation. `postcss.config.mjs` connects Tailwind's PostCSS plugin to the build. System fonts avoid external build-time font downloads. No component library is needed for this page.
+A request to `/` is rendered using `src/app/layout.tsx` and `src/app/(public)/page.tsx`. The layout provides document language, metadata, skip link, and shared header/footer components. The homepage introduces the planned service with links to public information pages. Unknown routes render `src/app/not-found.tsx` with a home link. See [public website](public-website.md) for the full route map.
 
-`tsconfig.json` enables strict checking and the `@/*` project-root alias. TypeScript checks code relationships; shared Zod schemas validate account form inputs on both client and server. `next typegen` generates route types before `tsc --noEmit`, allowing type checks after a fresh dependency installation without first running the development server.
+Pages and static content are server components by default. The header and catalogue use client boundaries for menu state, current-route highlighting, and service filtering. The error boundary is also a client component. Next.js supplies navigation/hydration runtime. Editorial service data sits in `src/shared/data/services.ts`; it does not establish operational availability. The request availability page awaits and validates category search parameters on the server.
+
+`src/frontend/styles/globals.css` imports Tailwind and defines the small shared color/font foundation. `postcss.config.mjs` connects Tailwind's PostCSS plugin to the build. System fonts avoid external build-time font downloads. No component library is needed for this page.
+
+`tsconfig.json` enables strict checking and maps `@/*` to `src/*`. TypeScript checks code relationships; shared Zod schemas validate account form inputs on both client and server. `next typegen` generates route types before `tsc --noEmit`, allowing type checks after a fresh dependency installation without first running the development server.
 
 `eslint.config.mjs` applies Next.js Core Web Vitals and TypeScript lint rules. Lint checks run explicitly and fail on warnings; a successful production build alone is not a lint result. Direct dependencies are pinned in `package.json`, with transitive versions/integrity in `package-lock.json`. Use `npm ci` to reproduce that dependency tree.
 
@@ -22,7 +26,7 @@ Account write endpoints live behind the strict `/api/auth/[...all]` route bounda
 
 ## Database boundary
 
-`lib/database/db.ts` exports a lazy singleton behind `server-only`; trusted CLI scripts use the client factory directly. Prisma's generated client lives in ignored `generated/prisma`; type-check and build commands regenerate it. `prisma.config.ts` defines schema, migrations, seed, and CLI connection URLs. `prisma/schema.prisma` declares the core model, and the checked-in SQL migration adds supported PostgreSQL constraints plus a partial unique index for current assignments.
+`src/backend/database/db.ts` exports a lazy singleton behind `server-only`; trusted CLI scripts use the client factory directly. Prisma's generated client lives in ignored `generated/prisma`; type-check and build commands regenerate it. `prisma.config.ts` defines schema, migrations, seed, and CLI connection URLs. `prisma/schema.prisma` declares the core model, and the checked-in SQL migration adds supported PostgreSQL constraints plus a partial unique index for current assignments.
 
 The public catalogue remains an editorial preview. The seed reads its category names/descriptions and creates inactive database reference rows without overwriting existing edits. Informational pages do not read job/user records; protected `/account` reads only the signed-in account. See [database design](database.md) for model boundaries, setup, and deferred entities.
 

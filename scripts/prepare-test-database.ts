@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { execFileSync } from "node:child_process";
-import { getTestDatabaseUrl } from "../lib/database/test-config";
+import { getTestDatabaseUrl } from "../src/backend/database/test-config";
 
 execFileSync(
   process.execPath,

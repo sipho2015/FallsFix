@@ -6,8 +6,8 @@ import { readdir, readFile, unlink } from "node:fs/promises";
 import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { test } from "node:test";
-import { createDatabaseClient } from "../lib/database/create-client";
-import { getTestDatabaseUrl } from "../lib/database/test-config";
+import { createDatabaseClient } from "../src/backend/database/create-client";
+import { getTestDatabaseUrl } from "../src/backend/database/test-config";
 
 async function assertLoginRedirect(response: Response) {
   if (response.status === 307) assert.equal(response.headers.get("location"), "/login");

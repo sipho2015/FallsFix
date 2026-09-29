@@ -107,11 +107,11 @@ Prisma CLI/scripts load `.env` through dotenv; Next.js loads its standard enviro
 | `npm run db:seed` | Add inactive reference area/categories without overwriting edits; refused with NODE_ENV=production |
 | `npm run test:database` | Apply committed migrations to the dedicated test database, then run integration tests |
 
-The seed runs explicitly. Repeating it adds no duplicate categories and does not re-enable or overwrite existing records. It creates no customers, technicians, administrator passwords, jobs, or prices. Its reference category names originate from `data/services.ts`; the public UI does not yet query these tables.
+The seed runs explicitly. Repeating it adds no duplicate categories and does not re-enable or overwrite existing records. It creates no customers, technicians, administrator passwords, jobs, or prices. Its reference category names originate from `src/shared/data/services.ts`; the public UI does not yet query these tables.
 
 ## Server/client separation
 
-Future Next.js server operations should import `getDatabase()` from `lib/database/db.ts`. The `server-only` marker rejects use from a browser component. Lazy singleton creation avoids repeated connection pools during development and avoids touching the database when only public pages are built. The lower-level client factory is for trusted server/CLI code, not public routes. No database object or environment value is passed to client components.
+Future Next.js server operations should import `getDatabase()` from `src/backend/database/db.ts`. The `server-only` marker rejects use from a browser component. Lazy singleton creation avoids repeated connection pools during development and avoids touching the database when only public pages are built. The lower-level client factory is for trusted server/CLI code, not public routes. No database object or environment value is passed to client components.
 
 ## Tests and verification
 

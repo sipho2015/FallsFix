@@ -3,9 +3,9 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { after, test } from "node:test";
 import type { Prisma, Role } from "../generated/prisma/client";
-import { createDatabaseClient } from "../lib/database/create-client";
-import { getTestDatabaseUrl } from "../lib/database/test-config";
-import { hasRole, loadPrincipal, readAuthorizedJob } from "../lib/authorization/policy";
+import { createDatabaseClient } from "../src/backend/database/create-client";
+import { getTestDatabaseUrl } from "../src/backend/database/test-config";
+import { hasRole, loadPrincipal, readAuthorizedJob } from "../src/backend/authorization/policy";
 
 const database = createDatabaseClient(getTestDatabaseUrl());
 after(() => database.$disconnect());

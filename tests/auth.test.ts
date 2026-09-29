@@ -2,11 +2,11 @@ import "dotenv/config";
 import assert from "node:assert/strict";
 import { after, test } from "node:test";
 import { randomBytes, randomUUID } from "node:crypto";
-import { createDatabaseClient } from "../lib/database/create-client";
-import { getTestDatabaseUrl } from "../lib/database/test-config";
-import { createAuth, type AuthMail } from "../lib/auth/factory";
-import { handleAuth } from "../lib/auth/handler";
-import { readAuthConfig, type AuthConfig } from "../lib/auth/config";
+import { createDatabaseClient } from "../src/backend/database/create-client";
+import { getTestDatabaseUrl } from "../src/backend/database/test-config";
+import { createAuth, type AuthMail } from "../src/backend/auth/factory";
+import { handleAuth } from "../src/backend/auth/handler";
+import { readAuthConfig, type AuthConfig } from "../src/backend/auth/config";
 
 const database = createDatabaseClient(getTestDatabaseUrl());
 const config: AuthConfig = { origin: "https://auth.example.test", secret: randomBytes(48).toString("hex"), transport: "file", clientIpHeader: "x-test-client" };

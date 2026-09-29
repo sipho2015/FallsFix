@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { after, test } from "node:test";
 import { randomUUID } from "node:crypto";
 import type { Prisma } from "../generated/prisma/client";
-import { createDatabaseClient } from "../lib/database/create-client";
-import { getTestDatabaseUrl } from "../lib/database/test-config";
+import { createDatabaseClient } from "../src/backend/database/create-client";
+import { getTestDatabaseUrl } from "../src/backend/database/test-config";
 import { seedReferenceData } from "../prisma/seed-data";
 
 const database = createDatabaseClient(getTestDatabaseUrl());

@@ -1,5 +1,5 @@
 import type { Prisma } from "../generated/prisma/client";
-import { services } from "../data/services";
+import { services } from "../src/shared/data/services";
 
 export async function seedReferenceData(database: Prisma.TransactionClient) {
   await database.serviceArea.upsert({
