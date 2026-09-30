@@ -57,8 +57,8 @@ export default function HowItWorksPage() {
           <details>
             <summary>Can I book a service now?</summary>
             <p>
-              Not yet. This is the prelaunch website. Requests and technician
-              applications will open after the service operation is ready.
+              You can submit a service request with a verified account. We review
+              availability and agree a price and appointment before confirming work.
             </p>
           </details>
           <details>

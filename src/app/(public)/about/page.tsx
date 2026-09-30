@@ -72,8 +72,8 @@ export default function AboutPage() {
         </div>
       </section>
       <div className="inline-note">
-        FallsFix is preparing to launch. We’re not yet accepting bookings or
-        claiming an active verified technician network.{" "}
+        Submit a request for review. Technician availability and appointments
+        are confirmed individually.{" "}
         <Link href="/how-it-works">Explore the planned process →</Link>
       </div>
     </main>

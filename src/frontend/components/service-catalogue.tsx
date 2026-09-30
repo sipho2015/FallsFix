@@ -20,7 +20,7 @@ export function ServiceCatalogue() {
   return (
     <section aria-labelledby="catalogue-title">
       <h2 id="catalogue-title" className="sr-only">
-        Explore planned services
+        Explore services
       </h2>
       <div className="catalogue-toolbar">
         <div className="filter-buttons" aria-label="Filter by service group">
@@ -47,7 +47,7 @@ export function ServiceCatalogue() {
         </div>
       </div>
       <p className="result-count" role="status">
-        {matches.length} planned {matches.length === 1 ? "service" : "services"}
+        {matches.length} {matches.length === 1 ? "service" : "services"}
       </p>
       {matches.length ? (
         <div className="service-grid">

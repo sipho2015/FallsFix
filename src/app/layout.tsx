@@ -4,6 +4,7 @@ import { SiteFooter } from "@/frontend/components/site-footer";
 import "@/frontend/styles/globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.SITE_URL ?? process.env.BETTER_AUTH_URL ?? "http://127.0.0.1:3000"),
   title: {
     default: "FallsFix | Local help. Properly managed.",
     template: "%s | FallsFix",

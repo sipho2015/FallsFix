@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HomeIllustration } from "@/frontend/components/home-illustration";
+import { BrandLogo } from "@/frontend/components/brand-logo";
 import { ServiceCard } from "@/frontend/components/service-card";
 import { Steps } from "@/frontend/components/steps";
 import { services } from "@/shared/data/services";
@@ -31,7 +31,9 @@ export default function HomePage() {
             For your home, your business, and your peace of mind.
           </p>
         </div>
-        <HomeIllustration />
+        <div className="hero-brand">
+          <BrandLogo hero />
+        </div>
       </section>
       <div className="principle-strip">
         <div className="shell">
@@ -47,12 +49,12 @@ export default function HomePage() {
             <h2 id="services-title">A helping hand for every corner.</h2>
           </div>
           <Link href="/services" className="text-link">
-            All 12 planned services <span aria-hidden="true">↗</span>
+            All 12 services <span aria-hidden="true">↗</span>
           </Link>
         </div>
         <p className="section-description">
-          Explore what we’re preparing to offer. Availability will be confirmed
-          when bookings open.
+          Choose a service and describe what you need. We review availability
+          before confirming an appointment.
         </p>
         <div className="service-grid">
           {services
@@ -78,7 +80,7 @@ export default function HomePage() {
               <p className="eyebrow">LESS CHASING. MORE CLARITY.</p>
               <h2 id="process-title">From “needs fixing” to taken care of.</h2>
             </div>
-            <span className="quiet-label">Our planned process</span>
+            <span className="quiet-label">How requests work</span>
           </div>
           <Steps />
           <Link href="/how-it-works" className="text-link">

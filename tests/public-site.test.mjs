@@ -18,8 +18,8 @@ test("public routes render unique titles, landmarks, and prelaunch safeguards", 
     assert.equal((html.match(/<h1\b/g) ?? []).length, 1, route);
     assert.match(html, /id="main-content"/, route);
     assert.match(html, /name="robots" content="noindex/, route);
-    assert.match(html, /Bookings are not open yet/, route);
-    if (authRoutes.includes(route)) assert.match(html, /<form\b/, route);
+    assert.match(html, /Local service requests, reviewed personally/, route);
+    if (authRoutes.includes(route) || route === "/request-service") assert.match(html, /<form\b/, route);
     else assert.doesNotMatch(html, /type="password"|<form\b/, route);
     const title = html.match(/<title>(.*?)<\/title>/)?.[1];
     assert.ok(title, route);
@@ -59,15 +59,15 @@ test("catalogue previews use known categories and do not submit requests", async
   assert.equal((catalogue.match(/class="service-card"/g) ?? []).length, 12);
   for (const [query, heading] of [
     ["service=plumbing", "Plumbing"],
-    ["service=unknown-service", "Requests coming soon"],
-    ["service=plumbing&service=electrical", "Requests coming soon"],
-    ["service=%3Cscript%3Ealert(1)%3C%2Fscript%3E", "Requests coming soon"],
+    ["service=unknown-service", "What do you need help with?"],
+    ["service=plumbing&service=electrical", "What do you need help with?"],
+    ["service=%3Cscript%3Ealert(1)%3C%2Fscript%3E", "What do you need help with?"],
   ]) {
     const response = await fetch(new URL(`/request-service?${query}`, base));
     assert.equal(response.status, 200);
     const html = await response.text();
-    assert.match(html, new RegExp(`<h2[^>]*>${heading}</h2>`));
-    assert.match(html, /No request has been submitted or saved/);
+    assert.ok(html.includes(`>${heading}</h2>`), `Missing heading: ${heading}`);
+    assert.match(html, /Submit service request/);
     assert.doesNotMatch(html, /<script>alert\(1\)<\/script>/);
   }
 });

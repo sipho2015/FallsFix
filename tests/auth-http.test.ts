@@ -4,6 +4,8 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { spawn, spawnSync } from "node:child_process";
 import { readdir, readFile, unlink } from "node:fs/promises";
 import path from "node:path";
+import sharp from "sharp";
+import { seedReferenceData } from "../prisma/seed-data";
 import { setTimeout as delay } from "node:timers/promises";
 import { test } from "node:test";
 import { createDatabaseClient } from "../src/backend/database/create-client";
@@ -35,7 +37,7 @@ test("Next.js serves registration, verification mail, protected account and logo
     windowsHide: true,
     // Discard request logs, which may contain the private verification URL.
     stdio: "ignore",
-    env: { ...process.env, NODE_ENV: "development", DATABASE_URL: databaseUrl, BETTER_AUTH_URL: origin,
+    env: { ...process.env, NODE_ENV: "development", DATABASE_URL: databaseUrl, BETTER_AUTH_URL: origin, NEXT_BUILD_DIR: ".next-auth-test",
       BETTER_AUTH_SECRET: randomBytes(48).toString("base64url"), AUTH_EMAIL_TRANSPORT: "file", AUTH_CLIENT_IP_HEADER: "x-test-client" },
   });
   const clientIp = `10.${randomBytes(1)[0]}.${randomBytes(1)[0]}.${randomBytes(1)[0]}`;
@@ -96,8 +98,43 @@ test("Next.js serves registration, verification mail, protected account and logo
     await denied("technician");
     await denied("unknown");
     const fixtureUser = await database.user.findUniqueOrThrow({ where: { email: address } });
+    await seedReferenceData(database);
+    const operation = (body: unknown, originHeader = origin, sessionCookie = cookie) => fetch(origin + "/api/operations", { method: "POST", headers: { origin: originHeader, cookie: sessionCookie, "content-type": "application/json" }, body: JSON.stringify(body) });
+    const requestBody = { action: "request", requestKey: randomUUID(), category: "electrical", description: "HTTP fixture socket repair", addressLine: "123 Fixture Street", locality: "Victoria Falls", contactName: "HTTP Fixture", contactPhone: "+263123456789" };
+    assert.equal((await operation(requestBody, "https://untrusted.example")).status, 403);
+    assert.equal((await operation(requestBody, origin, "")).status, 401);
+    assert.equal((await operation({ ...requestBody, role: "ADMIN" })).status, 400);
+    const submission = await operation(requestBody); assert.equal(submission.status, 200);
+    const saved = await submission.json(); assert.ok(saved.jobId);
+    assert.equal((await operation(requestBody)).status, 200);
+    const detail = await fetch(origin + "/jobs/" + saved.jobId, { headers: { cookie } });
+    assert.match(await detail.text(), /HTTP fixture socket repair/);
+    assert.equal((await operation({ action: "reviewRequest", jobId: saved.jobId, version: 0 })).status, 403);
+    const invalidPhoto = await fetch(origin + "/api/photos?jobId=" + saved.jobId, { method: "POST", headers: { cookie, origin }, body: "not a photo" });
+    assert.equal(invalidPhoto.status, 400);
+    const image = await sharp({ create: { width: 10, height: 10, channels: 3, background: "blue" } }).png().toBuffer();
+    const upload = await fetch(origin + "/api/photos?jobId=" + saved.jobId, { method: "POST", headers: { cookie, origin, "content-type": "image/png" }, body: image });
+    assert.equal(upload.status, 200);
+    const photo = await database.jobPhoto.findFirstOrThrow({ where: { jobId: saved.jobId } });
+    assert.equal((await fetch(origin + "/api/photos/" + photo.id)).status, 401);
+    const privatePhoto = await fetch(origin + "/api/photos/" + photo.id, { headers: { cookie } });
+    assert.equal(privatePhoto.status, 200); assert.equal(privatePhoto.headers.get("cache-control"), "private, no-store");
     await database.userRole.create({ data: { userId: fixtureUser.id, role: "ADMIN" } });
+    assert.equal((await operation({ action: "reviewRequest", jobId: saved.jobId, version: 0 })).status, 200);
     await allowed("admin", "Administrator workspace");
+    const invoice = await database.jobDocument.create({ data: {
+      jobId: saved.jobId, kind: "INVOICE", revision: 1, status: "ISSUED", currency: "USD", total: 10000,
+      scope: "HTTP invoice agreed scope", technicianSnapshot: "Fixture Technician",
+      issuerSnapshot: { invoiceIssuer: "Fixture Services", invoiceAddress: "Test Address", invoiceEmail: "billing@example.test", invoiceTaxId: "" },
+      lines: [{type:"LABOUR",description:"Repair labour",quantity:1,unitAmount:4000},{type:"MATERIALS",description:"Replacement part",quantity:1,unitAmount:5000},{type:"CALLOUT",description:"Approved travel",quantity:1,unitAmount:1000}],
+    } });
+    const invoiceResponse = await fetch(origin + "/jobs/" + saved.jobId + "/invoice", { headers: { cookie } });
+    assert.equal(invoiceResponse.status, 200);
+    const invoiceHtml = await invoiceResponse.text();
+    for (const expected of ["Fixture Technician", "billing@example.test", "LABOUR", "MATERIALS", "CALLOUT", "Payment status", "PAYMENT DUE", "USD 100.00"]) assert.ok(invoiceHtml.includes(expected), expected);
+    assert.ok(!invoiceHtml.includes("Tax / TIN / BPIN identifier:"));
+    await assertLoginRedirect(await fetch(origin + "/jobs/" + saved.jobId + "/invoice", { redirect: "manual" }));
+    await database.jobDocument.delete({where:{id:invoice.id}});
     await database.userRole.delete({ where: { userId_role: { userId: fixtureUser.id, role: "ADMIN" } } });
     await denied("admin");
     await database.userRole.create({ data: { userId: fixtureUser.id, role: "TECHNICIAN" } });
@@ -117,6 +154,17 @@ test("Next.js serves registration, verification mail, protected account and logo
     }
     const user = await database.user.findUnique({ where: { email: address } });
     if (user) {
+      const jobs = { customerId: user.id };
+      await database.notification.deleteMany({ where: { userId: user.id } });
+      await database.auditEvent.deleteMany({ where: { actorId: user.id } });
+      await database.jobPhoto.deleteMany({ where: { job: jobs } });
+      await database.jobRefund.deleteMany({ where: { document: { job: jobs } } });
+      await database.payment.deleteMany({ where: { document: { job: jobs } } });
+      await database.jobDocument.deleteMany({ where: { job: jobs } });
+      await database.jobStatusHistory.deleteMany({ where: { job: jobs } });
+      await database.jobLocation.deleteMany({ where: { job: jobs } });
+      await database.job.deleteMany({ where: jobs });
+      await database.rateLimit.deleteMany({ where: { key: { startsWith: "operations:" + user.id } } });
       await database.verification.deleteMany({ where: { value: user.id } });
       await database.userRole.deleteMany({ where: { userId: user.id } });
       await database.customerProfile.deleteMany({ where: { userId: user.id } });

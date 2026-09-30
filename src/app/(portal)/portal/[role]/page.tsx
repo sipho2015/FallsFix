@@ -2,24 +2,62 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageIntro } from "@/frontend/components/page-intro";
+import { ActionForm } from "@/frontend/components/action-form";
 import { isPortal, portalRoles } from "@/backend/authorization/policy";
 import { requireRole } from "@/backend/authorization/server";
-
+import { getDatabase } from "@/backend/database/db";
+import { jobScope, dateText } from "@/backend/operations/queries";
+import { formatMoney } from "@/shared/validation/operations";
+import { TechnicianVerification } from "@/frontend/components/technician-verification";
+import { invoiceSettingLabels, invoiceBalance, labourSplit, type ChargeLine } from "@/shared/validation/commercial";
 export const metadata: Metadata = { title: "Your workspace" };
 export const dynamic = "force-dynamic";
 const titles = { customer: "Customer workspace", technician: "Technician workspace", admin: "Administrator workspace" };
-
-export default async function PortalPage({ params }: { params: Promise<{ role: string }> }) {
-  const { role } = await params;
-  if (!isPortal(role)) notFound();
-  const principal = await requireRole(portalRoles[role]);
+export default async function PortalPage({ params, searchParams }: { params: Promise<{ role: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const { role } = await params; if (!isPortal(role)) notFound();
+  const principal = await requireRole(portalRoles[role]), db = getDatabase(), rawQuery = await searchParams;
+  const query = Object.fromEntries(Object.entries(rawQuery).filter((entry): entry is [string, string] => typeof entry[1] === "string"));
+  const page = Math.min(10000, Math.max(1, Math.trunc(Number(query.page)) || 1));
+  const scope = jobScope(principal, role);
+  const [jobs, count, notifications, profile, categories] = await Promise.all([
+    db.job.findMany({ where: scope, orderBy: { createdAt: "desc" }, skip: (page - 1) * 20, take: 20, include: { category: true, appointments: { where: { status: "CONFIRMED" }, orderBy: { startsAt: "asc" }, take: 1 } } }),
+    db.job.count({ where: scope }),
+    db.notification.findMany({ where: { userId: principal.user.id, readAt: null }, orderBy: { createdAt: "desc" }, take: 20 }),
+    db.user.findUniqueOrThrow({ where: { id: principal.user.id }, select: { name: true, phone: true, customerProfile: true, technicianProfile: true } }),
+    db.serviceCategory.findMany({ orderBy: { name: "asc" } }),
+  ]);
+  const options = categories.map(c => ({ value: c.id, label: c.name }));
+  const workHistory = role === "technician" ? await db.jobAssignment.findMany({ where: { technicianId: principal.user.id, endedAt: { not: null } }, orderBy: { endedAt: "desc" }, take: 30, select: { id: true, status: true, endedAt: true, job: { select: { reference: true, category: { select: { name: true } } } } } }) : [];
+  const adminData = role === "admin" ? {
+    users: await db.user.findMany({ where: query.q ? { OR: [{ name: { contains: query.q.slice(0,120), mode: "insensitive" } }, { email: { contains: query.q.slice(0,120), mode: "insensitive" } }] } : {}, take: 100, orderBy: { createdAt: "desc" }, select: { id: true, name: true, email: true, status: true, emailVerified: true, roles: { select: { role: true } }, technicianProfile: { select: { verificationStatus: true, isActive: true } } } }),
+    applications: await db.technicianApplication.findMany({ where: { status: "PENDING" }, take: 100 }),
+    settings: await db.businessSetting.findMany(),
+    audits: await db.auditEvent.findMany({ orderBy: { createdAt: "desc" }, take: 30 }),
+    counts: await db.job.groupBy({ by: ["status"], _count: true }),
+    workload: await db.jobAssignment.groupBy({ by: ["technicianId"], where: { endedAt: null }, _count: true }),
+  } : null;
+  const from = query.from && /^\d{4}-\d{2}-\d{2}$/.test(query.from) ? new Date(`${query.from}T00:00:00+02:00`) : new Date(new Date().getFullYear(), 0, 1);
+  const to = query.to && /^\d{4}-\d{2}-\d{2}$/.test(query.to) ? new Date(`${query.to}T23:59:59+02:00`) : new Date();
+  const reports = role === "admin" && Number.isFinite(+from) && Number.isFinite(+to) ? await db.jobDocument.findMany({ where: { kind: "INVOICE", status: "ISSUED", createdAt: { gte: from, lte: to } }, include: { payments: true, refund: true } }) : [];
+  const totals = reports.reduce<Record<string, { invoiced: number; paid: number }>>((sum,d) => { const row = sum[d.currency] ??= { invoiced: 0, paid: 0 }; const balance = invoiceBalance(d); row.invoiced += d.total - balance.credit; row.paid += balance.received - balance.refunded; return sum; }, {});
   return <main id="main-content" tabIndex={-1} className="shell page-content">
-    <PageIntro eyebrow="YOUR FALLSFIX WORKSPACE" title={titles[role]}>
-      <p>Welcome, {principal.user.name}.</p>
-    </PageIntro>
-    <div className="notice-panel"><h2>Your workspace is being prepared.</h2>
-      <p>Account access is ready. Tools for managing services will be added in the next stages. Bookings are not open yet.</p>
-    </div>
-    <Link href="/account" className="text-link">Back to your account</Link>
+    <PageIntro eyebrow="YOUR FALLSFIX WORKSPACE" title={titles[role]}><p>Welcome, {principal.user.name}.</p></PageIntro>
+    <nav className="auth-links"><Link href="/account">Your account</Link>{role === "customer" && <Link href="/request-service" className="button">Request a service</Link>}<a href="#profile">Edit profile</a>{role === "admin" && <><a href="#management">Manage services & people</a><a href="#reports">Reports</a></>}</nav>
+    <section><h2>{role === "technician" ? "Current assignments" : "Service requests"} ({count})</h2>
+      {jobs.length ? <div className="workspace-grid">{jobs.map(j => <article className="workspace-card" key={j.id}><span className="status-label">{j.status.replaceAll("_", " ").toLowerCase()}</span><h3><Link href={`/jobs/${j.id}`}>FF-{j.reference} · {j.category.name}</Link></h3><p>{j.description.slice(0,180)}</p>{j.appointments[0] && <p>Appointment: {dateText(j.appointments[0].startsAt)}</p>}<Link href={`/jobs/${j.id}`} className="text-link">Open request</Link></article>)}</div> : <p className="notice-panel">No requests yet. {role === "customer" ? "Submit your first service request to get started." : "New work will appear here when available."}</p>}
+      <nav className="auth-links" aria-label="Request pages">{page > 1 && <Link href={`?page=${page-1}`}>Previous</Link>}{count > page * 20 && <Link href={`?page=${page+1}`}>Next</Link>}</nav>
+    </section>
+    {role === "technician" && <section><h2>Your work history</h2><p>Recent ended assignments. Private customer details are unavailable after assignment ends.</p>{!workHistory.length && <p>No past assignments.</p>}<ul>{workHistory.map(a=><li key={a.id}>FF-{a.job.reference} - {a.job.category.name} - {a.status} - {a.endedAt && dateText(a.endedAt)}</li>)}</ul></section>}
+    <section><h2>Notifications</h2>{!notifications.length && <p>You&apos;re all caught up.</p>}{notifications.map(n => <div className="workspace-card" key={n.id}><p>{n.message}</p>{n.jobId && <Link href={`/jobs/${n.jobId}`}>View request</Link>}<ActionForm action="readNotification" title="Mark as read" fixed={{ notificationId: n.id }} /></div>)}</section>
+    <section id="profile"><h2>Your profile</h2><ActionForm action="profile" title="Save profile" fields={[{ name: "name", label: "Name", value: profile.name, maxLength: 120 }, { name: "phone", label: "Phone", type: "tel", value: profile.phone ?? "", maxLength: 32 }, ...(role === "customer" ? [{ name: "businessName", label: "Business name (optional)", value: profile.customerProfile?.businessName ?? "", required: false, maxLength: 160 }] : []), ...(role === "technician" ? [{ name: "bio", label: "Professional bio", type: "textarea", value: profile.technicianProfile?.bio ?? "", required: false, maxLength: 2000 }] : [])]} /></section>
+    {role === "customer" && <section><h2>Apply as a technician</h2><p>Applications require National ID/passport, a phone number, a profile photo, service area and selected skills. Provide competence evidence where available. An administrator will arrange private identity/photo review; do not put identity documents in job photos.</p><ActionForm action="application" title="Submit technician application" fields={[{ name: "categoryId", label: "Main skill", options }, { name: "phone", label: "Phone", type: "tel", value: profile.phone ?? "" }, { name: "bio", label: "Experience and qualifications", type: "textarea", maxLength: 2000 }]} /></section>}
+    {adminData && <>
+      <section id="management"><h2>Service coverage</h2><p>Requests can be received for review. Enable a category only when technician coverage is verified.</p><div className="workspace-grid">{categories.map(c => <article key={c.id} className="workspace-card"><h3>{c.name}</h3><p>{c.isActive ? "Active for assignment" : "Requests reviewed; coverage not confirmed"}</p><ActionForm action="catalogue" title={c.isActive ? "Pause assignments" : "Activate category"} fixed={{ categoryId: c.id, isActive: !c.isActive }} fields={[{ name: "reason", label: "Reason" }]} /></article>)}</div></section>
+      <section><h2>Technician applications</h2>{!adminData.applications.length && <p>No pending applications.</p>}{adminData.applications.map(a => <article className="workspace-card" key={a.userId}><h3>{adminData.users.find(u => u.id === a.userId)?.name ?? a.userId}</h3><p>{a.phone}</p><p>{a.bio}</p><TechnicianVerification userId={a.userId} categoryId={a.categoryId} options={options} phone={a.phone}/></article>)}</section>
+      <section><h2>Accounts</h2><form className="auth-links"><label>Find account <input type="search" name="q" maxLength={120} defaultValue={query.q}/></label><button className="button">Search accounts</button></form><p>Latest 100 matching accounts. Verification grants the technician role only.</p>{adminData.users.map(u => <details className="workspace-card" key={u.id}><summary>{u.name} · {u.email} · {u.status}</summary>{u.emailVerified && <TechnicianVerification userId={u.id} options={options}/>}{u.id !== principal.user.id && u.emailVerified && <><ActionForm action="role" title={u.roles.some(r=>r.role==="ADMIN")?"Revoke administrator role":"Grant administrator role"} fixed={{userId:u.id,role:"ADMIN",grant:!u.roles.some(r=>r.role==="ADMIN")}} fields={[{name:"reason",label:"Reason for this privileged change"}]} />{u.technicianProfile && <ActionForm action="technicianAccess" title={u.technicianProfile.isActive?"Deactivate technician":"Reactivate verified technician"} fixed={{userId:u.id,active:!u.technicianProfile.isActive}} fields={[{name:"reason",label:"Reason"}]} />}</>}{u.id !== principal.user.id && <ActionForm action="suspend" title={u.status === "ACTIVE" ? "Suspend account" : "Restore account"} fixed={{ userId: u.id, suspended: u.status === "ACTIVE" }} fields={[{ name: "reason", label: "Reason" }]} />}</details>)}</section>
+      <section><h2>Business settings</h2>{([["requestIntake", "Request intake (open or closed)"], ...Object.entries(invoiceSettingLabels)]).map(([key,label]) => <ActionForm key={key} action="setting" title={`Save ${label.toLowerCase()}`} fixed={{ key }} fields={[{ name: "value", label, required: ["requestIntake","invoiceIssuer","invoiceAddress"].includes(key), value: adminData.settings.find(s => s.key === key)?.value ?? (key === "requestIntake" ? "open" : "") }, { name: "reason", label: "Reason for change" }]} />)}</section>
+      <section id="reports"><h2>Operational reports</h2><h3>All-time job counts</h3><ul>{adminData.counts.map(r => <li key={r.status}>{r.status}: {r._count}</li>)}</ul><h3>Current technician workload</h3><ul>{adminData.workload.map(w => <li key={w.technicianId}>{adminData.users.find(u => u.id === w.technicianId)?.name ?? w.technicianId}: {w._count}</li>)}</ul><h3>Invoice cohort</h3><form className="auth-links"><label>Issued from <input type="date" name="from" defaultValue={query.from} /></label><label>Issued through <input type="date" name="to" defaultValue={query.to} /></label><button className="button">Filter report</button></form><p>Invoices issued in the selected period, net of settlement credits, with non-reversed receipts less paid refunds. A negative outstanding balance is money owed to customers. Default: this year. Currencies are kept separate.</p>{!reports.length && <p>No issued invoices in this period.</p>}<ul>{Object.entries(totals).map(([currency,r]) => <li key={currency}>Invoiced {formatMoney(r.invoiced,currency)} · Received {formatMoney(r.paid,currency)} · Outstanding {formatMoney(r.invoiced-r.paid,currency)}</li>)}</ul><h3>Labour allocation before refunds</h3><p>75% technician / 25% FallsFix, labour only. Reconcile refund cases before paying technicians; these amounts are not payout instructions.</p><ul>{reports.map(d=>{const split=labourSplit(d.lines as ChargeLine[]);return <li key={d.id}>Invoice {d.id}: technician {formatMoney(split.technician,d.currency)}; FallsFix {formatMoney(split.fallsfix,d.currency)}{split.unclassified && " - legacy items need classification review"}{d.refund && " - refund settlement requires reconciliation"}</li>;})}</ul></section>
+      <section><h2>Recent audit events</h2><ul className="timeline">{adminData.audits.map(a => <li key={a.id}>{dateText(a.createdAt)} · {a.action} · {a.detail}<br /><small>Actor {a.actorId} · Record {a.targetId}</small></li>)}</ul></section>
+    </>}
   </main>;
 }

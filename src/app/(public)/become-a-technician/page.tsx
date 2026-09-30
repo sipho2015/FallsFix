@@ -47,19 +47,19 @@ export default function TechnicianPage() {
           </div>
         </section>
         <aside className="notice-panel">
-          <p className="eyebrow">APPLICATIONS COMING SOON</p>
+          <p className="eyebrow">TECHNICIAN APPLICATIONS</p>
           <h2>Get ready to tell us about your skills.</h2>
           <p>
             We expect to review service experience, coverage, and relevant
             qualifications or references. Final verification requirements and
-            commercial terms will be shared before applications open.
+            commercial terms will be shared during your application review.
           </p>
           <p>
-            Applications are not currently being collected. Joining the network
+            Apply from your customer workspace. Joining the network
             will require approval; it will not guarantee assignments or income.
           </p>
-          <Link href="/services" className="button">
-            Explore planned categories ↗
+          <Link href="/portal/customer" className="button">
+            Apply from your workspace ↗
           </Link>
         </aside>
       </div>

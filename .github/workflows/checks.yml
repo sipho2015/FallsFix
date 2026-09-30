@@ -1,0 +1,52 @@
+name: Checks
+on:
+  push:
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-admin-only
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://fallsfix_test:ci-only-password@127.0.0.1:5432/fallsfix_ci
+      TEST_DATABASE_URL: postgresql://fallsfix_test:ci-only-password@127.0.0.1:5432/fallsfix_test
+      BETTER_AUTH_URL: http://127.0.0.1:3217
+      BETTER_AUTH_SECRET: ci-only-secret-not-for-production-123456789
+      AUTH_EMAIL_TRANSPORT: file
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.16.0
+          cache: npm
+      - run: npm ci
+      - name: Create isolated restricted databases
+        env:
+          PGPASSWORD: ci-admin-only
+        run: |
+          psql -h 127.0.0.1 -U postgres -v ON_ERROR_STOP=1 -c "CREATE ROLE fallsfix_test LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD 'ci-only-password'"
+          psql -h 127.0.0.1 -U postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE fallsfix_test OWNER fallsfix_test"
+          psql -h 127.0.0.1 -U postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE fallsfix_ci OWNER fallsfix_test"
+      - run: npm run check
+      - run: npm run test:database
+      - run: npm run test:operations
+      - run: npm run test:authorization
+      - run: npm run test:auth
+      - run: npm run test:auth:http
+      - run: npm run build
+      - run: |
+          npm start -- --port 3100 > /tmp/fallsfix.log 2>&1 &
+          for attempt in $(seq 1 30); do curl --fail http://127.0.0.1:3100/ >/dev/null 2>&1 && break; sleep 1; done
+          npm run test:smoke

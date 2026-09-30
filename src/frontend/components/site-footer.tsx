@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "./brand-logo";
 
 export function SiteFooter() {
   return (
@@ -6,7 +7,7 @@ export function SiteFooter() {
       <div className="shell footer-grid">
         <div>
           <Link href="/" className="brand" aria-label="FallsFix home">
-            FallsFix<span>.</span>
+            <BrandLogo />
           </Link>
           <p>
             Local care for the
@@ -30,14 +31,14 @@ export function SiteFooter() {
         <div>
           <h2>A local beginning</h2>
           <p>
-            We’re preparing to serve homes and businesses in Victoria Falls.
-            Service requests and applications are not open yet.
+            Serving homes and businesses in Victoria Falls.
+            Submit a request for availability and scope review.
           </p>
         </div>
       </div>
       <div className="shell footer-bottom">
         <span>FallsFix · Built around your community.</span>
-        <span>Prelaunch website</span>
+        <span>Local services. Real solutions.</span>
       </div>
     </footer>
   );

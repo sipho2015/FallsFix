@@ -59,3 +59,7 @@ These policies are the Phase 0 design baseline, not implemented behavior or appr
 - Who can appoint administrators, how the first administrator is securely provisioned, and how account recovery is handled.
 
 The design does not assert legal compliance or establish binding commercial terms. These unresolved decisions are launch gates, not reasons to invent defaults throughout the application.
+
+## Confirmed commercial rules (2026-09-30)
+
+The owner-confirmed rules in [owner-decisions.md](owner-decisions.md) supersede the preliminary decisions-to-validate list where explicitly addressed: verification evidence, individually approved call-out charges, labour-only 75/25 allocation, eligible-receipt-based refunds, three-day completion-notified rework, protected photo retention, and optional invoice identifiers. The implementation uses restricted operator evidence references for verification and manual settlement/payment records. It does not imply payment-provider processing, automatic technician payouts or a completed launch acceptance.

@@ -6,5 +6,5 @@ export const metadata: Metadata = {
     "Create and verify your FallsFix customer account.",
 };
 export default function RegisterPage() {
-  return <AuthPage mode="register" title="Start with a customer account." description="We use your name and email to manage your account. Verify your email before logging in. Creating an account does not submit a service request; bookings are not open yet." />;
+  return <AuthPage mode="register" title="Start with a customer account." description="We use your name and email to manage your account. Verify your email before logging in. After verification, log in to submit and track service requests." />;
 }

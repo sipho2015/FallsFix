@@ -16,7 +16,7 @@ export default function ContactPage() {
       >
         <p>
           Get in touch by phone or email during our operating hours. FallsFix is
-          preparing to launch; online service bookings are not open yet.
+          accepts online requests for review before confirming service availability.
         </p>
       </PageIntro>
       <div className="contact-grid">

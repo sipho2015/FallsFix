@@ -8,5 +8,6 @@ export const metadata: Metadata = {
 export default async function LoginPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const query = await searchParams;
   const notice = query.error ? "This verification link is invalid or expired. Request another verification email below." : query.verified === "1" ? "Your email has been verified. You can now log in." : query.reset === "1" ? "Your password has been changed. Log in with your new password." : undefined;
-  return <AuthPage mode="login" title="Welcome back." description="Log in with your verified email address. Service bookings are still being prepared." notice={notice} />;
+  const returnTo = typeof query.next === "string" && /^\/request-service(?:\?service=[a-z-]+)?$/.test(query.next) ? query.next : undefined;
+  return <AuthPage mode="login" title="Welcome back." description="Log in with your verified email address. Track your service requests and manage your account." notice={notice} returnTo={returnTo} />;
 }

@@ -1,0 +1,16 @@
+ALTER TABLE "JobDocument" ADD CONSTRAINT "JobDocument_amount" CHECK ("total" >= 0 AND "revision" > 0);
+ALTER TABLE "JobDocument" ADD CONSTRAINT "JobDocument_kind" CHECK ("kind" IN ('QUOTE','INVOICE'));
+ALTER TABLE "JobDocument" ADD CONSTRAINT "JobDocument_currency" CHECK ("currency" IN ('USD','ZAR','ZWG'));
+ALTER TABLE "JobDocument" ADD CONSTRAINT "JobDocument_status" CHECK (("kind" = 'INVOICE' AND "status" = 'ISSUED') OR ("kind" = 'QUOTE' AND "status" IN ('SENT','APPROVED','REJECTED','EXPIRED','SUPERSEDED')));
+CREATE UNIQUE INDEX "one_issued_invoice" ON "JobDocument" ("jobId") WHERE "kind" = 'INVOICE' AND "status" = 'ISSUED';
+CREATE UNIQUE INDEX "one_current_quote" ON "JobDocument" ("jobId") WHERE "kind" = 'QUOTE' AND "status" IN ('SENT','APPROVED');
+ALTER TABLE "Payment" ADD CONSTRAINT "Payment_positive" CHECK ("amount" > 0);
+ALTER TABLE "JobReview" ADD CONSTRAINT "JobReview_rating" CHECK ("rating" BETWEEN 1 AND 5);
+ALTER TABLE "JobPhoto" ADD CONSTRAINT "JobPhoto_size" CHECK (octet_length("bytes") BETWEEN 1 AND 5242880);
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_user" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT;
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_job" FOREIGN KEY ("jobId") REFERENCES "Job"("id") ON DELETE RESTRICT;
+ALTER TABLE "AuditEvent" ADD CONSTRAINT "AuditEvent_actor" FOREIGN KEY ("actorId") REFERENCES "User"("id") ON DELETE RESTRICT;
+ALTER TABLE "Payment" ADD CONSTRAINT "Payment_actor" FOREIGN KEY ("actorId") REFERENCES "User"("id") ON DELETE RESTRICT;
+ALTER TABLE "JobPhoto" ADD CONSTRAINT "JobPhoto_uploader" FOREIGN KEY ("uploaderId") REFERENCES "User"("id") ON DELETE RESTRICT;
+ALTER TABLE "TechnicianApplication" ADD CONSTRAINT "TechnicianApplication_user" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT;
+ALTER TABLE "TechnicianApplication" ADD CONSTRAINT "TechnicianApplication_category" FOREIGN KEY ("categoryId") REFERENCES "ServiceCategory"("id") ON DELETE RESTRICT;

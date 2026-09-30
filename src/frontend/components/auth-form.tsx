@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { authPaths, authSchemas, type AuthMode } from "@/shared/validation/auth";
 
 const labels: Record<AuthMode, string> = { register: "Create customer account", login: "Log in", forgot: "Send reset link", resend: "Send verification link", reset: "Save new password" };
-export function AuthForm({ mode, token = "" }: { mode: AuthMode; token?: string }) {
+export function AuthForm({ mode, token = "", returnTo }: { mode: AuthMode; token?: string; returnTo?: string }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
@@ -31,7 +31,7 @@ export function AuthForm({ mode, token = "" }: { mode: AuthMode; token?: string 
         return;
       }
       form.reset();
-      if (mode === "login") { router.replace("/account"); router.refresh(); }
+      if (mode === "login") { router.replace(returnTo ?? "/account"); router.refresh(); }
       else if (mode === "reset") { router.replace("/login?reset=1"); router.refresh(); }
       else setMessage(mode === "forgot" ? "If an account exists for that address, you will receive a password-reset link. Check your email." : "If this address needs verification, you will receive a link. Check your email before logging in.");
     } catch { setMessage("Unable to connect. Check your connection and try again."); }

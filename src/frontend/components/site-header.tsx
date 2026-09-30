@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BrandLogo } from "./brand-logo";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 
@@ -19,8 +20,7 @@ export function SiteHeader() {
   return (
     <>
       <div className="launch-banner">
-        Made for Victoria Falls <span aria-hidden="true">·</span> Preparing to
-        launch. Bookings are not open yet.
+        Made for Victoria Falls <span aria-hidden="true">·</span> Local service requests, reviewed personally.
       </div>
       <header className="site-header">
         <div className="shell header-inner">
@@ -30,7 +30,7 @@ export function SiteHeader() {
             className="brand"
             onClick={() => setOpen(false)}
           >
-            FallsFix<span>.</span>
+            <BrandLogo />
           </Link>
           <button
             ref={menuButton}

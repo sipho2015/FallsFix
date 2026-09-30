@@ -15,8 +15,8 @@ export default function ServicesPage() {
         title="What needs taking care of?"
       >
         <p>
-          From a small repair to a property refresh, explore our planned
-          services. Bookings are not open yet; this catalogue does not guarantee
+          From a small repair to a property refresh, explore our
+          services. Submit a request for review; this catalogue does not guarantee
           availability.
         </p>
       </PageIntro>
