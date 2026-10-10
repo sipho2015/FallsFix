@@ -203,7 +203,7 @@ test("decline and reassignment revoke technician access; expired quotes stay blo
 test("photo decoding rejects SVG, corrupt input and oversized uploads; valid images are reencoded",async()=>{
   await rejected(()=>normalizePhoto(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>')));
   await rejected(()=>normalizePhoto(Buffer.from("not an image")));
-  await rejected(()=>normalizePhoto(Buffer.alloc(5*1024*1024+1)));
+  await assert.rejects(()=>normalizePhoto(Buffer.alloc(4*1024*1024+1)), (error: unknown) => error instanceof OperationError && error.status === 413);
   const source=await sharp({create:{width:32,height:32,channels:3,background:"orange"}}).png().toBuffer();
   const result=await normalizePhoto(source);const metadata=await sharp(result).metadata();assert.equal(metadata.format,"webp");assert.equal(metadata.exif,undefined);
 });

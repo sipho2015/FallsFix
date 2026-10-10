@@ -102,4 +102,10 @@ The Phase 2 dependency tree uses Next.js 16.3.6, React 19.3.0, TypeScript 5.9.3,
 
 ## Next phase
 
+### Dependency review (2026-10-10)
+
+Next.js and its ESLint configuration are now pinned to 16.3.8, and the lockfile selects source-map-js 1.2.2. These resolve the newly reported production dependency advisories. The full audit still reports five high-severity entries from one unpatched development dependency chain: eslint-config-next → @next/eslint-plugin-next → fast-glob → micromatch → braces 3.0.3. [The braces advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) lists no patched release. Lint processes repository paths/patterns rather than customer input; track the upstream fix and re-audit before release. Do not downgrade the Next.js lint configuration to an incompatible major or force an audit fix to hide this outstanding finding.
+
+Interactive browser/operator acceptance is recorded in [the acceptance checklist](acceptance.md). Current implementation and verification supersede the historical phase descriptions below; see [progress](progress.md).
+
 Phase 6 adds [role/ownership read policies and protected workspace routes](authorization.md) to the existing authentication. Phase 7 adds the customer portal. See [working progress](progress.md) for focused continuation notes and [authentication setup](authentication.md) for local email capture. An origin remote now exists; earlier "no remote" statements describe the original foundation. Bookings remain closed, with browser and SMTP checks outstanding.

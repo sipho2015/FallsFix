@@ -10,7 +10,7 @@ FallsFix coordinates local service requests in Victoria Falls, Zimbabwe. The app
 - Printable invoices, manual payment receipts and reversals, private job photos, notifications, reviews, and operational reports.
 - Database migrations, automated integration checks, CI configuration, and local backup/restore tooling.
 
-This is a development implementation, not a deployed or approved live service. Production hosting, domain, verified administrator identity, SMTP delivery, browser verification, and a real pilot remain launch requirements. Commercial policies must be agreed before live operation. See [progress](docs/progress.md), [operations](docs/operations.md), and [deployment](docs/deployment.md).
+This is a development implementation, not a deployed or approved live service. Production hosting, domain, verified administrator identity, SMTP delivery, browser verification, and a real pilot remain launch requirements. Owner-confirmed commercial policies are implemented; operator acceptance and remaining privacy/support arrangements are required before live operation. See [progress](docs/progress.md), [operations](docs/operations.md), and [deployment](docs/deployment.md).
 
 ## Development
 
@@ -37,7 +37,7 @@ npm run test:auth:http
 npm run build
 ```
 
-Tests use a separate local database. Public smoke tests require a running server and `TEST_BASE_URL`. Production configuration is checked with `npm run release:check`; local development settings intentionally fail that gate.
+Tests use a separate local database. Run the database suites sequentially, then the HTTP suite before the production build: Next.js regenerates shared type files. Public smoke tests require a running server and `TEST_BASE_URL`. Production configuration is checked with `npm run release:check`, including the canonical site/authentication origin and PostgreSQL URL; local development settings intentionally fail that gate.
 
 ## Project references
 

@@ -94,6 +94,14 @@ test("Next.js serves registration, verification mail, protected account and logo
       assert.doesNotMatch(html, /<h1[^>]*>(Customer|Technician|Administrator) workspace<\/h1>/);
     };
     await allowed("customer", "Customer workspace");
+    for (const [view, heading] of [["requests", "My requests"], ["notifications", "Your updates"], ["profile", "Your profile"], ["application", "Apply as a technician"]]) {
+      const response = await fetch(origin + "/portal/customer?view=" + view, { headers: { cookie } });
+      assert.equal(response.status, 200);
+      const html = await response.text();
+      assert.match(html, new RegExp("<h2[^>]*>" + heading));
+      assert.ok(html.includes('aria-label="Customer navigation"'));
+      if (view !== "application") assert.ok(!html.includes('name="categoryId"'), "Application form belongs in its own section");
+    }
     await denied("admin");
     await denied("technician");
     await denied("unknown");
@@ -107,6 +115,10 @@ test("Next.js serves registration, verification mail, protected account and logo
     const submission = await operation(requestBody); assert.equal(submission.status, 200);
     const saved = await submission.json(); assert.ok(saved.jobId);
     assert.equal((await operation(requestBody)).status, 200);
+    const customerOverview = await (await fetch(origin + "/portal/customer?view=overview&page=999", { headers: { cookie } })).text();
+    assert.ok(customerOverview.includes("HTTP fixture socket repair"), "Overview always shows the most recent requests regardless of a stale page parameter");
+    const customerRequests = await (await fetch(origin + "/portal/customer?view=requests", { headers: { cookie } })).text();
+    assert.ok(customerRequests.includes("HTTP fixture socket repair"));
     const detail = await fetch(origin + "/jobs/" + saved.jobId, { headers: { cookie } });
     assert.match(await detail.text(), /HTTP fixture socket repair/);
     assert.equal((await operation({ action: "reviewRequest", jobId: saved.jobId, version: 0 })).status, 403);
@@ -122,6 +134,17 @@ test("Next.js serves registration, verification mail, protected account and logo
     await database.userRole.create({ data: { userId: fixtureUser.id, role: "ADMIN" } });
     assert.equal((await operation({ action: "reviewRequest", jobId: saved.jobId, version: 0 })).status, 200);
     await allowed("admin", "Administrator workspace");
+    const adminOverview = await (await portal("admin")).text();
+    assert.ok(adminOverview.includes('aria-label="Administrator navigation"'));
+    assert.ok(adminOverview.includes("Awaiting review"));
+    assert.ok(!adminOverview.includes('name="identityEvidence"'), "Verification forms should not clutter the overview");
+    for (const [view, heading] of [["requests","Service requests"],["people","Technician applications"],["services","Service coverage"],["reports","Operational reports"],["notifications","Notifications"],["activity","Recent audit events"],["settings","Business settings"],["profile","Your profile"]]) {
+      const response = await fetch(origin + "/portal/admin?view=" + view, {headers:{cookie}});
+      assert.equal(response.status,200);
+      const html = await response.text();
+      assert.match(html, new RegExp("<h2[^>]*>"+heading));
+      if (view === "people" || view === "reports") assert.ok(html.includes('name="view" value="'+view+'"'), "Filters must retain the current section");
+    }
     const invoice = await database.jobDocument.create({ data: {
       jobId: saved.jobId, kind: "INVOICE", revision: 1, status: "ISSUED", currency: "USD", total: 10000,
       scope: "HTTP invoice agreed scope", technicianSnapshot: "Fixture Technician",

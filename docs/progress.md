@@ -39,3 +39,50 @@ Identity/profile-photo review uses administrator-recorded private evidence refer
 - Eight migrations applied to development/test databases. Backup/restore drill passed, including the refund table.
 - Photo cleanup dry-run returned zero eligible photos. No deletion mode, administrator provisioning, prepared invoice identity, IT-only coverage activation or hosted deployment was performed.
 - Interactive browser acceptance remains pending: no browser sessions are available. Original identity/photo review and refund-related technician payout reconciliation remain operator tasks.
+
+## Administrator workspace redesign (2026-09-30)
+
+Replaced the single long administrator screen with an overview and focused URL-addressable sections: requests, people, service coverage, reports, notifications, activity, settings and profile. Desktop uses a branded sidebar; narrow screens use horizontally scrollable navigation with account access retained. Overview cards use actual stored counts, requests use a compact table, verification forms are expandable, and settings show current values before opening an editor. Search/report submissions preserve their active section. Existing permissions and operation handlers are unchanged.
+
+Authenticated HTTP checks passed for every administrator section, overview/form separation, retained filter navigation, existing account permissions and invoices. Interactive visual inspection is still pending because browser discovery returned no connected sessions.
+
+## Account landing layout
+
+Replaced the oversized welcome/notice block and bare workspace links with a compact identity strip, verified-email badge and role-specific workspace cards. Administrator appears first for authorized users; existing role checks still determine which cards are shown. Sign-out remains the existing action, separated into its own footer area. Layout and email wrapping adapt to small screens.
+
+## Developer continuation (2026-10-10)
+
+Completed the unfinished customer workspace styling: responsive overview, request cards, status totals, updates, profile and technician application sections. Fixed a Prisma groupBy contextual typing failure and ignored stale pagination on overview screens so recent requests stay recent. Added authenticated HTTP coverage for customer sections and the stale-page regression alongside the administrator section checks.
+
+Updated Next.js and eslint-config-next from 16.3.6 to 16.3.8 and source-map-js to 1.2.2. Production dependency audit reports zero vulnerabilities; CI now rejects high/critical production dependency findings. Full audit still reports five high-severity entries in the unpatched development-only braces dependency chain; see [development notes](development.md#dependency-review-2026-10-10). PostgreSQL tests also emit an adapter query-concurrency deprecation warning; current pinned pg 8 tests pass, but review adapter compatibility before any pg 9 upgrade.
+
+Release checking now validates a PostgreSQL database URL and requires SITE_URL to match the canonical authentication origin. Synthetic complete configuration passes; mismatched origin and invalid database configuration are rejected. Local configuration still correctly fails the production gate for missing HTTPS/SMTP/proxy configuration.
+
+### Verification
+
+- Lint and TypeScript passed on the patched framework.
+- 35 database/authentication/authorization/operational tests passed. Authenticated HTTP scenario passed again after the framework update, covering all customer/admin sections, access denial, request retries, private uploads and printable invoices.
+- Production build passed on Next.js 16.3.8. All four public smoke tests passed against that build: 40 automated checks overall.
+- All 17 service/logo/icon/social image endpoints returned image responses; /api/health returned 200.
+- Eight test migrations are applied. Restarted the existing local PostgreSQL cluster; backup/isolated restore passed with matching checked table counts, and photo cleanup dry-run found zero eligible photos.
+- Release configuration's positive and negative synthetic checks passed. Git whitespace check passed.
+
+### Remaining external acceptance
+
+Browser connection still reports no available browser, so visual, keyboard, screen-reader and interactive retry acceptance remain unverified. [Acceptance checklist](acceptance.md) now provides screen/viewport, synthetic workflow, financial reconciliation and hosted acceptance steps. Hosting/domain/SMTP provider details and intended-owner registration/verification status were requested; no production configuration is invented.
+
+No administrator was provisioned, owner settings/IT-only coverage were not applied, no photos were deleted, and no commit, push or hosted deployment was performed. Current changes remain local and uncommitted. Production preview was started at http://127.0.0.1:3100 for smoke verification; it uses the development database, retains noindex, and is not a live launch. Stop this preview before rebuilding in the same checkout.
+
+## Vercel preparation (2026-10-10)
+
+Owner supplied Vercel, fallsfix.com and siphomoyo893@gmail.com. Added [Vercel deployment instructions](vercel.md) and vercel.json with Next.js detection, locked install and a release-check-before-build gate. Production origins are documented as https://fallsfix.com; local environment values remain local. Vercel project/account access, domain DNS, hosted PostgreSQL and SMTP provider/credentials remain unconfirmed. The email address is recorded as the administrator; whether it is also the mail sender and whether the account is registered/verified were requested separately.
+
+Reduced the shared client/request-reader/image-decoder photo limit to 4 MiB (displayed as 4 MB), below Vercel's 4.5 MB function payload ceiling. Updated operational/deployment documentation and the oversized-photo regression. Lint, TypeScript, all 12 operational tests, Vercel JSON validation and whitespace checks passed. Interactive/hosted checks, administrator provisioning and retention scheduling remain pending. No linked Vercel project or installed Vercel CLI was found. The earlier local production preview was stopped for rebuilding.
+
+Authenticated HTTP verification and the refreshed production build also passed after the Vercel preparation changes. The local preview remains stopped; no deployment was attempted without project access and the required production services.
+
+Owner follow-up confirmed that no Vercel project or hosted PostgreSQL database exists yet and the intended owner account is not registered/verified. SMTP provider choice and domain ownership/DNS remain outstanding. Next external steps: create/connect the owner's Vercel project, provision hosted PostgreSQL, configure private production variables and mail delivery, deploy for acceptance, then register/verify the owner before audited administrator provisioning.
+
+## First hosted inspection (2026-10-10)
+
+Owner reported Vercel Ready at https://falls-fix.vercel.app. Read-only HTTP inspection confirmed the homepage and services return 200, but login/registration are "coming soon" pages without forms and the request-service page has no form. /api/health and /portal/admin return 404. This is an earlier public-site build, not the current local workflow implementation. The local work remains uncommitted/unpushed; check Vercel's connected repository, branch and deployed commit before updating it. Hosted database/mail configuration and intended-owner verification remain unconfirmed. No hosted writes, registration, administrator provisioning or deployment changes were performed.

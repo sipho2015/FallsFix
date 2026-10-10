@@ -32,6 +32,7 @@ jobs:
           node-version: 24.16.0
           cache: npm
       - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
       - name: Create isolated restricted databases
         env:
           PGPASSWORD: ci-admin-only

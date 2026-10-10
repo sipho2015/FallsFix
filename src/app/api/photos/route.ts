@@ -3,13 +3,14 @@ import { getDatabase } from "@/backend/database/db";
 import { readAuthorizedJob } from "@/backend/authorization/policy";
 import { OperationError } from "@/backend/operations/service";
 import { normalizePhoto } from "@/backend/operations/photos";
+import { MAX_PHOTO_BYTES } from "@/shared/validation/photos";
 export async function POST(request: Request) {
   try {
     const userId = await apiIdentity(request, true);
     const jobId = new URL(request.url).searchParams.get("jobId") ?? "";
     const db = getDatabase();
     if (!await readAuthorizedJob(db, userId, jobId)) throw new OperationError("Request not found.", 404);
-    const bytes = await normalizePhoto(await boundedBody(request, 5 * 1024 * 1024));
+    const bytes = await normalizePhoto(await boundedBody(request, MAX_PHOTO_BYTES));
     await db.$transaction(async tx => {
       await tx.$queryRaw`SELECT id FROM "Job" WHERE id = ${jobId}::uuid FOR UPDATE`;
       if (!await readAuthorizedJob(tx, userId, jobId)) throw new OperationError("Request not found.", 404);
