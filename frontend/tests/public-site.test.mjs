@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFile } from "node:fs/promises";
+import sharp from "sharp";
 
 const base = process.env.TEST_BASE_URL ?? "http://127.0.0.1:3100";
 const authRoutes = ["/login", "/register", "/forgot-password", "/verify-email", "/reset-password"];
-const routes = ["/", "/services", "/how-it-works", "/about", "/become-a-technician", "/contact", "/request-service", ...authRoutes];
+const routes = ["/", "/services", "/how-it-works", "/about", "/become-a-technician", "/contact", "/request-service", "/privacy", "/photo-credits", ...authRoutes];
 
 test("public routes render unique titles, landmarks, and prelaunch safeguards", async () => {
   const titles = new Set();
@@ -76,4 +78,23 @@ test("unknown pages return an actual 404 with a recovery link", async () => {
   const response = await fetch(new URL("/does-not-exist", base));
   assert.equal(response.status, 404);
   assert.match(await response.text(), /Back to FallsFix/);
+});
+
+test("service photography is available, optimized and linked to the catalogue", async () => {
+  const photographs = JSON.parse(await readFile(new URL("../shared/data/photography.json", import.meta.url), "utf8"));
+  const catalogue = await (await fetch(new URL("/services", base))).text();
+  for (const photograph of photographs) {
+    const response = await fetch(new URL(photograph.src, base));
+    assert.equal(response.status, 200, photograph.src);
+    assert.match(response.headers.get("content-type"), /image\/webp/);
+    const bytes = Buffer.from(await response.arrayBuffer());
+    assert.ok(bytes.length < 350_000, "Photographs should stay small for mobile connections: " + photograph.src);
+    const metadata = await sharp(bytes).metadata();
+    assert.equal(metadata.width, 1440);
+    assert.equal(metadata.height, 960);
+    if (photograph.slug !== "coordination") assert.ok(catalogue.includes(encodeURIComponent(photograph.src)), "Catalogue photo: " + photograph.slug);
+  }
+  const technicianPage = await (await fetch(new URL("/become-a-technician", base))).text();
+  assert.ok(technicianPage.includes('/portal/customer?view=application'));
+  assert.doesNotMatch(technicianPage, /planned technician portal|future application process/);
 });

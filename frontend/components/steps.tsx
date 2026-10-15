@@ -7,7 +7,7 @@ export const steps = [
   {
     title: "Agree on the right help",
     description:
-      "FallsFix will coordinate a suitable technician and share a quotation when needed.",
+      "Review technician availability, the call-out charge and the quoted scope before dispatch or work.",
   },
   {
     title: "Follow the job through",

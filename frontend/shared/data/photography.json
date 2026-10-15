@@ -1,0 +1,119 @@
+[
+  {
+    "slug": "electrical",
+    "src": "/images/photography/electrical.webp",
+    "alt": "An electrician working on an electrical switchboard",
+    "photographer": "Pixabay",
+    "source": "https://www.pexels.com/photo/electrician-fixing-an-opened-switchboard-257736/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "plumbing",
+    "src": "/images/photography/plumbing.webp",
+    "alt": "A plumber repairing a pipe with a wrench",
+    "photographer": "Bulat843",
+    "source": "https://www.pexels.com/photo/plumber-repairing-pipe-with-wrench-indoors-32588548/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/32588548/pexels-photo-32588548.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "air-conditioning",
+    "src": "/images/photography/air-conditioning.webp",
+    "alt": "A technician repairing an outdoor air-conditioning unit",
+    "photographer": "Richard Low Hong",
+    "source": "https://www.pexels.com/photo/man-in-gray-t-shirt-fixing-the-aircon-7347538/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/7347538/pexels-photo-7347538.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "appliance-repair",
+    "src": "/images/photography/appliance-repair.webp",
+    "alt": "A front-loading washing machine during a wash cycle",
+    "photographer": "Engin Akyurt",
+    "source": "https://www.pexels.com/photo/the-washing-machine-washes-dirty-colored-clothes-27376258/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/27376258/pexels-photo-27376258.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "carpentry",
+    "src": "/images/photography/carpentry.webp",
+    "alt": "A carpenter measuring a timber board at a workbench",
+    "photographer": "Tima Miroshnichenko",
+    "source": "https://www.pexels.com/photo/a-person-doing-carpentry-6790089/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/6790089/pexels-photo-6790089.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "painting",
+    "src": "/images/photography/painting.webp",
+    "alt": "A person painting an interior wall with a roller",
+    "photographer": "Blue Bird",
+    "source": "https://www.pexels.com/photo/smiling-man-painting-the-wall-using-a-paint-roller-7218562/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/7218562/pexels-photo-7218562.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "cleaning",
+    "src": "/images/photography/cleaning.webp",
+    "alt": "A cleaner mopping a bright living room",
+    "photographer": "Tima Miroshnichenko",
+    "source": "https://www.pexels.com/photo/a-woman-cleaning-the-floor-6196582/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/6196582/pexels-photo-6196582.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "gardening",
+    "src": "/images/photography/gardening.webp",
+    "alt": "A gardener cutting grass with a lawn mower",
+    "photographer": "Magic K",
+    "source": "https://www.pexels.com/photo/a-person-mowing-the-lawn-6728926/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/6728926/pexels-photo-6728926.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "security",
+    "src": "/images/photography/security.webp",
+    "alt": "A security camera mounted on a building wall",
+    "photographer": "Giant Asparagus",
+    "source": "https://www.pexels.com/photo/cctv-surveillance-camera-on-urban-wall-37591157/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/37591157/pexels-photo-37591157.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "it-support",
+    "src": "/images/photography/it-support.webp",
+    "alt": "A technician working on a computer motherboard",
+    "photographer": "Tima Miroshnichenko",
+    "source": "https://www.pexels.com/photo/man-fixing-a-computer-6754846/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/6754846/pexels-photo-6754846.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "electronics",
+    "src": "/images/photography/electronics.webp",
+    "alt": "A technician repairing a phone under a microscope",
+    "photographer": "Tima Miroshnichenko",
+    "source": "https://www.pexels.com/photo/man-person-smartphone-broken-6755092/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/6755092/pexels-photo-6755092.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "handyman",
+    "src": "/images/photography/handyman.webp",
+    "alt": "A tradesperson fitting a wall fixture with a power tool",
+    "photographer": "Tima Miroshnichenko",
+    "source": "https://www.pexels.com/photo/drilling-hole-on-the-wall-6473980/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/6473980/pexels-photo-6473980.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  },
+  {
+    "slug": "coordination",
+    "src": "/images/photography/coordination.webp",
+    "alt": "Hands taking notes beside a laptop to coordinate work",
+    "photographer": "Nataliya Vaitkevich",
+    "source": "https://www.pexels.com/photo/a-desk-workspace-5186349/",
+    "license": "https://www.pexels.com/license/",
+    "downloadUrl": "https://images.pexels.com/photos/5186349/pexels-photo-5186349.jpeg?auto=compress&cs=tinysrgb&w=1600"
+  }
+]

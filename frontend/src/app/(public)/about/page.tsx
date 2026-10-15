@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageIntro } from "@/frontend/components/page-intro";
-
+import { ContextPhoto } from "@/frontend/components/context-photo";
 export const metadata: Metadata = {
   title: "About us",
   description:
-    "Why FallsFix is building a local property-maintenance and service-management business for Victoria Falls.",
+    "Local service coordination for homes and businesses in Victoria Falls.",
 };
 export default function AboutPage() {
   return (
@@ -15,66 +15,63 @@ export default function AboutPage() {
         title="For the places we call our own."
       >
         <p>
-          FallsFix is a property-maintenance and service-management business
-          being built for Victoria Falls, Zimbabwe.
+          FallsFix brings service requests, local technician coordination and
+          job records together for Victoria Falls, Zimbabwe.
         </p>
       </PageIntro>
-      <div className="two-column story-panel">
-        <div>
-          <span className="eyebrow">THE IDEA BEHIND FALLSFIX</span>
-          <h2>Finding a technician is only the beginning.</h2>
-        </div>
-        <div>
+      <div className="editorial-split">
+        <ContextPhoto subject="carpentry" />
+        <section>
+          <p className="eyebrow">MORE THAN A PHONE NUMBER</p>
+          <h2>Good service needs a clear next step.</h2>
           <p>
-            Arranging a repair often means more than finding a phone number.
-            Someone needs to understand the problem, agree on a price,
-            coordinate a visit, and make sure the outcome is clear.
+            Explain the problem once. Follow your request, review the proposed
+            scope and price, and keep your appointments, photos and invoices in
+            one place.
           </p>
           <p>
-            We’re building FallsFix to bring those steps together. Customers
-            will request help, administrators will coordinate suitable
-            technicians, and everyone will have a shared record of the job.
+            FallsFix reviews requests and coordinates eligible technicians.
+            Coverage and availability are confirmed for each job before an
+            appointment is agreed.
           </p>
-          <p>
-            We’re starting with Victoria Falls and individual service requests.
-            Our first priority is making that everyday process dependable.
-          </p>
-        </div>
+          <Link href="/request-service" className="button">
+            Tell us what needs attention
+          </Link>
+        </section>
       </div>
       <section className="section" aria-labelledby="principles-title">
-        <p className="eyebrow">WHAT WE’RE BUILDING TOWARDS</p>
-        <h2 id="principles-title">Care that goes beyond the repair.</h2>
+        <p className="eyebrow">HOW WE WORK</p>
+        <h2 id="principles-title">Care beyond the repair.</h2>
         <div className="values-grid">
           <article>
-            <span>01 / COMMUNITY</span>
-            <h3>Local skills, local needs</h3>
+            <span>01 / LOCAL</span>
+            <h3>Built around Victoria Falls</h3>
             <p>
-              A network designed around the homes, lodges, shops, and workplaces
-              of Victoria Falls.
+              Homes, lodges, shops and workplaces across the city and its
+              suburbs can submit requests for review.
             </p>
           </article>
           <article>
-            <span>02 / CLARITY</span>
-            <h3>No guessing what comes next</h3>
+            <span>02 / CLEAR</span>
+            <h3>Agree before work starts</h3>
             <p>
-              Agreed scope, visible job progress, and records that keep the
-              details together.
+              Review the call-out charge, job scope and quotation before
+              dispatch or chargeable work. Changes need a fresh agreement.
             </p>
           </article>
           <article>
-            <span>03 / ACCOUNTABILITY</span>
-            <h3>A managed service journey</h3>
+            <span>03 / ACCOUNTABLE</span>
+            <h3>A record you can return to</h3>
             <p>
-              Technician verification, coordinated assignments, and a way to
-              raise concerns are part of the planned service.
+              Technician verification, job history, private evidence, invoices
+              and a complaint process support each service journey.
             </p>
           </article>
         </div>
       </section>
       <div className="inline-note">
-        Submit a request for review. Technician availability and appointments
-        are confirmed individually.{" "}
-        <Link href="/how-it-works">Explore the planned process →</Link>
+        Submitting a request does not confirm a technician or appointment.{" "}
+        <Link href="/how-it-works">See how requests work</Link>.
       </div>
     </main>
   );

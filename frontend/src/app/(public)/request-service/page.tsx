@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PageIntro } from "@/frontend/components/page-intro";
 import { ActionForm } from "@/frontend/components/action-form";
 import { services } from "@/shared/data/services";
+import { ContextPhoto } from "@/frontend/components/context-photo";
 export const metadata: Metadata = { title: "Request a service", description: "Tell FallsFix what you need help with in Victoria Falls." };
 export default async function RequestPage({ searchParams }: { searchParams: Promise<{ service?: string | string[] }> }) {
   const query = await searchParams;
@@ -20,6 +21,6 @@ export default async function RequestPage({ searchParams }: { searchParams: Prom
         { name: "directions", label: "Directions (optional)", type: "textarea", required: false, maxLength: 1000 },
         { name: "preferredAt", label: "Preferred date and time (CAT, optional)", type: "datetime-local", required: false },
       ]} />
-    </section><aside className="notice-panel"><h2>What happens next?</h2><p>You receive a request reference once it is saved. An administrator reviews your needs and arranges an eligible technician.</p><p>You approve the quoted scope and price before work starts. A preferred date is not a confirmed booking.</p><p>Add optional photos securely from the saved request. Avoid including identity documents or sensitive information.</p><Link href="/contact" className="text-link">Need help? Contact us</Link></aside></div>
+    </section><aside className="notice-panel"><ContextPhoto subject={service?.slug ?? "handyman"} /><h2>What happens next?</h2><p>You receive a request reference once it is saved. An administrator reviews your needs and arranges an eligible technician.</p><p>You approve the quoted scope and price before work starts. A preferred date is not a confirmed booking.</p><p>Add optional photos securely from the saved request. Avoid including identity documents or sensitive information.</p><Link href="/contact" className="text-link">Need help? Contact us</Link></aside></div>
   </main>;
 }

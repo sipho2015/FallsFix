@@ -27,6 +27,7 @@ export function SiteFooter() {
           <Link href="/become-a-technician">Become a technician</Link>
           <Link href="/contact">Contact & support</Link>
           <Link href="/register">Create an account</Link>
+          <Link href="/privacy">Your information</Link>
         </nav>
         <div>
           <h2>A local beginning</h2>
@@ -38,7 +39,7 @@ export function SiteFooter() {
       </div>
       <div className="shell footer-bottom">
         <span>FallsFix · Built around your community.</span>
-        <span>Local services. Real solutions.</span>
+        <Link href="/photo-credits">Photo credits</Link>
       </div>
     </footer>
   );

@@ -3,10 +3,10 @@ import type { ReactNode } from "react";
 import { BrandLogo } from "./brand-logo";
 
 const navigation = [
-  ["overview", "Overview", "01"], ["requests", "Service requests", "02"],
-  ["people", "People & technicians", "03"], ["services", "Service coverage", "04"],
-  ["reports", "Financial reports", "05"], ["notifications", "Notifications", "06"],
-  ["activity", "Activity log", "07"], ["settings", "Business settings", "08"], ["profile", "My profile", "09"],
+  ["overview", "Overview"], ["requests", "Service requests"],
+  ["people", "People & technicians"], ["services", "Service coverage"],
+  ["reports", "Financial reports"], ["notifications", "Notifications"],
+  ["activity", "Activity log"], ["settings", "Business settings"], ["profile", "My profile"],
 ];
 const descriptions: Record<string,string> = {
   overview: "A clear view of your service operation. Start with what needs attention.",
@@ -25,7 +25,7 @@ export function AdminShell({view,name,notifications,children}:{view:string;name:
     <aside className="admin-sidebar">
       <Link href="/portal/admin" className="admin-brand"><BrandLogo/></Link>
       <p className="admin-nav-label">MANAGEMENT</p>
-      <nav aria-label="Administrator navigation">{navigation.map(([key,title,number])=><Link key={key} href={key==="overview"?"/portal/admin":"/portal/admin?view="+key} aria-current={view===key?"page":undefined}><span className="admin-nav-icon" aria-hidden="true">{number}</span><span>{title}</span>{key==="notifications" && notifications>0 && <span className="admin-nav-count">{notifications}{notifications===20?"+":""}</span>}</Link>)}</nav>
+      <nav aria-label="Administrator navigation">{navigation.map(([key,title])=><Link key={key} href={key==="overview"?"/portal/admin":"/portal/admin?view="+key} aria-current={view===key?"page":undefined}><span>{title}</span>{key==="notifications" && notifications>0 && <span className="admin-nav-count">{notifications}{notifications===20?"+":""}</span>}</Link>)}</nav>
       <div className="admin-identity"><span className="admin-avatar" aria-hidden="true">{name.slice(0,1).toUpperCase()}</span><div><strong>{name}</strong><Link href="/account">Account & sign out</Link></div></div>
     </aside>
     <div className="admin-content">

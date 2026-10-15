@@ -5,7 +5,7 @@ import { ServiceCatalogue } from "@/frontend/components/service-catalogue";
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Explore FallsFix’s planned repair, home care, and technology services in Victoria Falls.",
+    "Explore repair, home care and technology request categories in Victoria Falls. Coverage is confirmed for each job.",
 };
 export default function ServicesPage() {
   return (
@@ -22,7 +22,7 @@ export default function ServicesPage() {
       </PageIntro>
       <ServiceCatalogue />
       <aside className="inline-note">
-        Not sure which category fits? Once requests open, describe the problem
+        Not sure which category fits? Submit a request describing the problem
         and FallsFix will help identify the right kind of support.
       </aside>
     </main>

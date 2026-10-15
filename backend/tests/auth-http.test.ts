@@ -145,6 +145,11 @@ test("Next.js serves registration, verification mail, protected account and logo
       assert.match(html, new RegExp("<h2[^>]*>"+heading));
       if (view === "people" || view === "reports") assert.ok(html.includes('name="view" value="'+view+'"'), "Filters must retain the current section");
     }
+    const applicationCategory = await database.serviceCategory.findUniqueOrThrow({ where: { slug: "it-support" } });
+    await database.technicianApplication.create({ data: { userId: fixtureUser.id, categoryId: applicationCategory.id, phone: "+263123456789", bio: "HTTP technician application fixture" } });
+    const filteredPeople = await (await fetch(origin + "/portal/admin?view=people&q=no-matching-account-fixture", { headers: { cookie } })).text();
+    assert.ok(filteredPeople.includes("<h3>HTTP Test Customer</h3>"), "Applicant names must remain visible when the separate account search has no matches");
+    assert.ok(filteredPeople.includes("HTTP technician application fixture"));
     const invoice = await database.jobDocument.create({ data: {
       jobId: saved.jobId, kind: "INVOICE", revision: 1, status: "ISSUED", currency: "USD", total: 10000,
       scope: "HTTP invoice agreed scope", technicianSnapshot: "Fixture Technician",
@@ -191,6 +196,7 @@ test("Next.js serves registration, verification mail, protected account and logo
       await database.verification.deleteMany({ where: { value: user.id } });
       await database.userRole.deleteMany({ where: { userId: user.id } });
       await database.customerProfile.deleteMany({ where: { userId: user.id } });
+      await database.technicianApplication.deleteMany({ where: { userId: user.id } });
       await database.technicianProfile.deleteMany({ where: { userId: user.id } });
       await database.user.delete({ where: { id: user.id } });
     }

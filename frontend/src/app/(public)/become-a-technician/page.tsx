@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageIntro } from "@/frontend/components/page-intro";
-
+import { ContextPhoto } from "@/frontend/components/context-photo";
 export const metadata: Metadata = {
   title: "Become a technician",
   description:
-    "Learn about FallsFix’s planned technician network and future application process.",
+    "Apply to the FallsFix technician network and learn about verification and assigned work.",
 };
 export default function TechnicianPage() {
   return (
@@ -15,54 +15,86 @@ export default function TechnicianPage() {
         title="Good work starts with good people."
       >
         <p>
-          We’re preparing a network of local technicians and service providers
-          who take pride in their craft and communicate clearly with customers.
+          Apply to offer your skills through FallsFix in Victoria Falls. Tell us
+          what you do, where you work and the experience you bring.
         </p>
       </PageIntro>
-      <div className="two-column">
+      <div className="editorial-split">
+        <ContextPhoto subject="handyman" />
         <section>
-          <h2>Built around the work you do.</h2>
+          <h2>Work with a clear plan.</h2>
           <div className="detail-list">
             <article>
-              <h3>Clear job information</h3>
+              <h3>Your assignments in one place</h3>
               <p>
-                The planned technician portal will bring assigned work, customer
-                needs, and service locations together.
+                Approved technicians can review assigned jobs, accept or decline
+                work, and see the service details needed for current
+                assignments.
               </p>
             </article>
             <article>
-              <h3>A coordinated process</h3>
+              <h3>Keep the customer informed</h3>
               <p>
-                FallsFix will manage assignment and quotations, while you assess
-                the issue and record the work performed.
+                Record assessments, appointments, progress and private job
+                photos. The customer approves the scope and any call-out price
+                before dispatch.
               </p>
             </article>
             <article>
-              <h3>A record of your work</h3>
+              <h3>Keep a useful work history</h3>
               <p>
-                Progress notes, before-and-after photos, and job history will
-                help keep each service accountable.
+                Completed assignments and service records remain organized.
+                Access to private customer details ends when your assignment
+                ends.
               </p>
             </article>
           </div>
         </section>
-        <aside className="notice-panel">
-          <p className="eyebrow">TECHNICIAN APPLICATIONS</p>
-          <h2>Get ready to tell us about your skills.</h2>
-          <p>
-            We expect to review service experience, coverage, and relevant
-            qualifications or references. Final verification requirements and
-            commercial terms will be shared during your application review.
-          </p>
-          <p>
-            Apply from your customer workspace. Joining the network
-            will require approval; it will not guarantee assignments or income.
-          </p>
-          <Link href="/portal/customer" className="button">
-            Apply from your workspace ↗
-          </Link>
-        </aside>
       </div>
+      <section className="section" aria-labelledby="verification-title">
+        <div className="two-column">
+          <div>
+            <p className="eyebrow">BEFORE YOU ARE APPROVED</p>
+            <h2 id="verification-title">Tell us about your skills.</h2>
+            <ul className="verification-list">
+              <li>
+                National ID or passport and a profile photo for private review.
+              </li>
+              <li>A verified phone number and the areas you cover.</li>
+              <li>The services and skills you want to offer.</li>
+              <li>
+                A qualification, previous-work evidence or reference where
+                available.
+              </li>
+            </ul>
+            <p>
+              The administrator arranges private verification. Do not upload
+              identity documents as job photos. Approval is reviewed for each
+              skill.
+            </p>
+          </div>
+          <aside className="notice-panel">
+            <h2>Ready to apply?</h2>
+            <p>
+              Create and verify your customer account, then open the technician
+              application tab. Submit your main skill, phone number and
+              experience.
+            </p>
+            <Link href="/portal/customer?view=application" className="button">
+              Open technician application
+            </Link>
+            <p>
+              Approval does not guarantee assignments or income. Technician
+              allocation is 75% of approved labour charges only; parts,
+              materials and other charges are separate. Confirm payout
+              arrangements with FallsFix before accepting work.
+            </p>
+            <Link href="/register" className="text-link">
+              Create an account
+            </Link>
+          </aside>
+        </div>
+      </section>
     </main>
   );
 }

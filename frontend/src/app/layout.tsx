@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteHeader } from "@/frontend/components/site-header";
 import { SiteFooter } from "@/frontend/components/site-footer";
 import "@/frontend/styles/globals.css";
+import "@/frontend/styles/public-refresh.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.SITE_URL ?? process.env.BETTER_AUTH_URL ?? "http://127.0.0.1:3000"),
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
     template: "%s | FallsFix",
   },
   description:
-    "Local property maintenance and service coordination for Victoria Falls. FallsFix is preparing to launch.",
+    "Local service requests, technician coordination, approved quotes and job updates for Victoria Falls.",
   // Keep prelaunch pages unindexed until operational details are approved.
   robots: { index: false, follow: false },
 };

@@ -20,7 +20,7 @@ export function SiteHeader() {
   return (
     <>
       <div className="launch-banner">
-        Made for Victoria Falls <span aria-hidden="true">·</span> Local service requests, reviewed personally.
+        <span className="launch-context">Made for Victoria Falls <span aria-hidden="true">·</span> </span>Local service requests, reviewed personally.
       </div>
       <header className="site-header">
         <div className="shell header-inner">
@@ -39,8 +39,7 @@ export function SiteHeader() {
             aria-controls="primary-navigation"
             onClick={() => setOpen(!open)}
           >
-            {open ? "Close menu" : "Menu"}{" "}
-            <span aria-hidden="true">{open ? "×" : "☰"}</span>
+            {open ? "Close menu" : "Menu"}
           </button>
           <nav
             id="primary-navigation"
