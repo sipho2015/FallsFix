@@ -1,0 +1,25 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/.next-*": true,
+    "**/generated": true,
+    "**/.local": true,
+    "**/*.tsbuildinfo": true,
+    "**/next-env.d.ts": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next*": true,
+    "**/generated": true,
+    "**/.local": true
+  },
+  "explorer.compactFolders": false,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "package.json": "package-lock.json,.node-version",
+    "next.config.ts": "next-env.d.ts,postcss.config.mjs,tsconfig.json,eslint.config.mjs",
+    "README.md": "AGENTS.md,CLAUDE.md,.editorconfig,.gitattributes,.gitignore"
+  }
+}

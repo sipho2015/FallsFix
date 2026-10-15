@@ -2,6 +2,20 @@
 
 FallsFix coordinates local service requests in Victoria Falls, Zimbabwe. The application includes the public website and protected customer, technician, and administrator workspaces.
 
+## Project folders
+
+| Area | Contents |
+| --- | --- |
+| [frontend](frontend/README.md) | Interface components, styles, browser-safe shared schemas and public smoke tests |
+| [backend](backend/README.md) | Authentication, permissions, business workflows, operator scripts and integration tests |
+| [database](database/README.md) | Prisma schema/migrations/seed, database client, database scripts/tests and generated client |
+| [vercel](vercel/README.md) | Production release checks and hosting guidance |
+| [.github](.github/README.md) | GitHub automation |
+
+`frontend/src/app` holds Next.js routes and API entry points; `frontend/public` holds public assets. Next.js/PostCSS/Vercel configuration lives inside `frontend`; root npm, TypeScript, lint and Prisma configuration coordinates the complete application. `docs` holds shared business and operational documentation. This is one integrated application, not five separate deployable services. Run npm commands from the repository root; existing command names are unchanged. Vercel's project Root Directory must now be **frontend**, with files outside that directory included in the build.
+
+VS Code hides generated output, dependencies and private `.local` storage using the checked-in Explorer settings. The local database, backups and credentials are preserved. Build caches can be regenerated and are not source code.
+
 ## Implemented
 
 - Owner-supplied logo throughout the site, application icons, and social previews; twelve illustrated service categories.

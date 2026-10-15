@@ -23,24 +23,41 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
+      "@/frontend/*": [
+        "./frontend/*"
+      ],
+      "@/shared/*": [
+        "./frontend/shared/*"
+      ],
+      "@/backend/database/*": [
+        "./database/client/*"
+      ],
+      "@/backend/*": [
+        "./backend/*"
+      ],
+      "@/app/*": [
+        "./frontend/src/app/*"
       ]
     }
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    ".next-production/types/**/*.ts",
-    ".next-production/dev/types/**/*.ts",
-    ".next-auth-test/types/**/*.ts",
-    ".next-auth-test/dev/types/**/*.ts"
+    "frontend/next-env.d.ts",
+    "frontend/**/*.ts",
+    "frontend/**/*.tsx",
+    "backend/**/*.ts",
+    "database/**/*.ts",
+    "vercel/**/*.ts",
+    "prisma.config.ts",
+    "frontend/.next/types/**/*.ts",
+    "frontend/.next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    ".next-auth-test"
+    "**/.local",
+    "database/generated",
+    "frontend/.next-auth-test",
+    ".next",
+    ".next-auth-test",
+    ".next-production"
   ]
 }

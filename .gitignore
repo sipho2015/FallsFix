@@ -26,7 +26,8 @@ generated/
 
 # Editor and operating-system files
 .idea/
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .DS_Store
 Thumbs.db
 Desktop.ini

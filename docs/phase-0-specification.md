@@ -278,9 +278,9 @@ At the end of Phase 0, only README and the two Phase 0 documents existed. Phase 
 app/                 Next.js pages, layouts and server entry points
 components/          Shared interface components
 lib/                 Domain operations, authorization, validation and adapters
-prisma/              Schema, migrations and deliberate development seed scripts
+database/prisma/              Schema, migrations and deliberate development seed scripts
 public/              Public static assets; never private customer photos
-tests/               Tests and fixtures as each feature arrives
+backend/tests/               Tests and fixtures as each feature arrives
 docs/                Architecture, database, API, security and deployment guidance
 ```
 

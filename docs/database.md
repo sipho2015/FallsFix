@@ -1,6 +1,6 @@
 # Database foundation — Phase 4
 
-FallsFix uses PostgreSQL with Prisma ORM 7.10.0 and the PostgreSQL driver adapter. PostgreSQL stores related records and enforces foreign keys and constraints. Prisma generates typed queries from `prisma/schema.prisma`; migrations are reviewed SQL files that recreate the structure on another database. The public website still uses editorial categories and does not require a live database.
+FallsFix uses PostgreSQL with Prisma ORM 7.10.0 and the PostgreSQL driver adapter. PostgreSQL stores related records and enforces foreign keys and constraints. Prisma generates typed queries from `database/prisma/schema.prisma`; migrations are reviewed SQL files that recreate the structure on another database. The public website still uses editorial categories and does not require a live database.
 
 ## Implemented scope
 
@@ -64,7 +64,7 @@ From the repository root:
 
 ```powershell
 npm ci
-./scripts/start-local-db.ps1
+./database/scripts/start-local-db.ps1
 npm run db:generate
 npm run db:deploy
 npm run db:seed
@@ -79,7 +79,7 @@ Stop this project-owned cluster when needed:
 & 'C:\Program Files\PostgreSQL\18\bin\pg_ctl.exe' -D '.local/postgres' -m fast -w stop
 ```
 
-Restart it with `./scripts/start-local-db.ps1`. This is a local development process, not an installed service or production deployment. Do not expose this local cluster to a network. Do not delete `.local/postgres` if you need its data.
+Restart it with `./database/scripts/start-local-db.ps1`. This is a local development process, not an installed service or production deployment. Do not expose this local cluster to a network. Do not delete `.local/postgres` if you need its data.
 
 ## Existing PostgreSQL server or another operating system
 
@@ -107,11 +107,11 @@ Prisma CLI/scripts load `.env` through dotenv; Next.js loads its standard enviro
 | `npm run db:seed` | Add inactive reference area/categories without overwriting edits; refused with NODE_ENV=production |
 | `npm run test:database` | Apply committed migrations to the dedicated test database, then run integration tests |
 
-The seed runs explicitly. Repeating it adds no duplicate categories and does not re-enable or overwrite existing records. It creates no customers, technicians, administrator passwords, jobs, or prices. Its reference category names originate from `src/shared/data/services.ts`; the public UI does not yet query these tables.
+The seed runs explicitly. Repeating it adds no duplicate categories and does not re-enable or overwrite existing records. It creates no customers, technicians, administrator passwords, jobs, or prices. Its reference category names originate from `frontend/shared/data/services.ts`; the public UI does not yet query these tables.
 
 ## Server/client separation
 
-Future Next.js server operations should import `getDatabase()` from `src/backend/database/db.ts`. The `server-only` marker rejects use from a browser component. Lazy singleton creation avoids repeated connection pools during development and avoids touching the database when only public pages are built. The lower-level client factory is for trusted server/CLI code, not public routes. No database object or environment value is passed to client components.
+Future Next.js server operations should import `getDatabase()` from `database/client/db.ts`. The `server-only` marker rejects use from a browser component. Lazy singleton creation avoids repeated connection pools during development and avoids touching the database when only public pages are built. The lower-level client factory is for trusted server/CLI code, not public routes. No database object or environment value is passed to client components.
 
 ## Tests and verification
 

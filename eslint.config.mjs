@@ -5,8 +5,9 @@ import nextTypeScript from "eslint-config-next/typescript";
 export default defineConfig([
   ...nextVitals,
   ...nextTypeScript,
+  { settings: { next: { rootDir: "frontend/" } } },
   {
-    files: ["src/frontend/**/*.{ts,tsx}", "src/shared/**/*.{ts,tsx}"],
+    files: ["frontend/components/**/*.{ts,tsx}", "frontend/shared/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": ["error", { patterns: [{
         group: ["@/backend/**", "**/backend/**", "**/generated/**", "@/app/**"],
@@ -15,7 +16,7 @@ export default defineConfig([
     },
   },
   {
-    files: ["src/backend/**/*.{ts,tsx}"],
+    files: ["backend/auth/**/*.{ts,tsx}", "backend/authorization/**/*.{ts,tsx}", "backend/operations/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": ["error", { patterns: [{
         group: ["@/frontend/**", "**/frontend/**", "@/app/**"],
@@ -26,11 +27,14 @@ export default defineConfig([
   globalIgnores([
     ".next/**",
     ".next-*/**",
+    "frontend/.next/**",
+    "frontend/.next-*/**",
     "out/**",
     "dist/**",
     "coverage/**",
-    "generated/**",
+    "database/generated/**",
     ".local/**",
     "next-env.d.ts",
+    "frontend/next-env.d.ts",
   ]),
 ]);

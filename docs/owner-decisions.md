@@ -9,7 +9,7 @@ Confirmed by the owner on 2026-09-30. These supersede the preliminary answers fr
 - Currently fulfilled category: Computer and IT support (`it-support`).
 - Prepared invoice issuer: FallsFix. Address: 4223 Chinotimba.
 - **Keep the prepared invoice identity and IT-only category changes pending until the intended administrator has registered and verified the account.** Do not bootstrap or apply these changes merely because policy development is complete.
-- `scripts/apply-owner-settings.ts` remains available for the later audited configuration step. It has not been executed.
+- `backend/scripts/apply-owner-settings.ts` remains available for the later audited configuration step. It has not been executed.
 
 ## Technician approval
 
@@ -50,7 +50,7 @@ Implementation: the administrator reviews original identity/photo evidence throu
 - A complaint submitted within that period can be approved for free rework even if the operator reviews it after the deadline. Active rework is tracked separately from historical completion and is finished with a recorded customer agreement.
 - Supersede the former one-day photo deletion rule. Protect photos through the complete rework window and while any complaint, unpaid refund, rework, fraud investigation or other required retention reason is active.
 - Manual retention holds have a reason and audited release. Releasing a manual hold cannot bypass automatic complaint/refund/rework protection.
-- The cleanup command defaults to a dry run: `npx tsx scripts/cleanup-job-photos.ts`. Use `--apply` to delete only eligible photos after rechecking protections under the job lock. Newly added evidence also gets at least three days.
+- The cleanup command defaults to a dry run: `npx tsx backend/scripts/cleanup-job-photos.ts`. Use `--apply` to delete only eligible photos after rechecking protections under the job lock. Newly added evidence also gets at least three days.
 - No cleanup has been run in deletion mode and no host schedule has been installed. Schedule this command during deployment. Jobs without a trustworthy completion-notification timestamp remain protected pending review; failed repairs are automatically held.
 - Backups are separate protected recovery copies. Their expiry and any restoration must respect holds and re-run retention review before service resumes; this command does not edit backup archives or claim their copies are erased.
 - FallsFix handles removal requests. Complaint response target remains immediate operator attention, not an automated response guarantee.

@@ -1,6 +1,6 @@
 # Authorization — Phase 6
 
-`src/backend/authorization/server.ts` is the server-only entry point. `requirePrincipal()` validates the current session, account status, and email verification, then reloads database roles. `requireRole()` checks explicit membership; administrators do not inherit unrelated roles. Customer access requires a customer profile; technician access also requires an active, verified technician profile. Membership is never accepted from browser data or cached in session claims.
+`backend/authorization/server.ts` is the server-only entry point. `requirePrincipal()` validates the current session, account status, and email verification, then reloads database roles. `requireRole()` checks explicit membership; administrators do not inherit unrelated roles. Customer access requires a customer profile; technician access also requires an active, verified technician profile. Membership is never accepted from browser data or cached in session claims.
 
 Protected `/portal/customer`, `/portal/technician`, and `/portal/admin` pages enforce these checks before rendering. `/account` shows only permitted workspace links. These are access-controlled starting pages, not completed dashboards. Anonymous visitors go to login; unauthorized or unknown workspaces render the generic not-found page. Next streaming may carry redirects/not-found content in a 200 response; denial tests verify no protected heading is rendered.
 

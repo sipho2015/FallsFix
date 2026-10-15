@@ -1,5 +1,21 @@
 # Working progress
 
+## Frontend project root (2026-10-15)
+
+Moved root `src` and `public` into `frontend/src` and `frontend/public` at the owner's request. `frontend` is now the Next.js project directory, containing Next.js, PostCSS, app TypeScript and Vercel configuration plus a private npm workspace package. Root npm dev/build/start/typegen commands explicitly target it, while root lint/TypeScript/database/operator commands still cover the repository. Root `.env` remains private and is loaded by frontend configuration. Turbopack and output tracing use the repository root so backend/database imports are included. Updated authenticated HTTP server launch and path documentation.
+
+Vercel must use Root Directory **frontend**, include source files outside that directory, and read `frontend/vercel.json`. The install/build commands call the root workspace from there. Root `src` and `public` no longer exist; this is a physical move, not just an Explorer exclusion. Lockfile was updated for the frontend workspace; a frozen-install dry-run passed. Lint, TypeScript, authenticated HTTP verification, production build and all four public smoke tests passed. Updated local preview runs at http://127.0.0.1:3102; no hosted settings or deployments were changed.
+
+The production health probe caught Next.js caching its initial environment before loading root `.env`; frontend configuration now explicitly reloads the root environment while retaining inherited deployment/test variables. Repeated lint/TypeScript, authenticated HTTP, build and public smoke verification passed after this fix. All 17 image endpoints passed and database health returned 200. The earlier root-directory preview was stopped.
+
+## Repository organization (2026-10-15)
+
+Grouped source into `frontend/`, `backend/`, `database/`, `vercel/` and `.github/`. Frontend owns components/styles/shared browser-safe schemas and smoke tests; backend owns auth/authorization/operations, operator scripts and integration tests; database owns Prisma schema/migrations/seed, client, local database/backup/test scripts, integrity tests and generated client. Vercel owns the release-check script; GitHub retains its required workflow location. Updated imports, aliases, Prisma config, npm commands, lint rules and documentation; package dependencies and database schema are unchanged.
+
+Next.js still discovers routes/API entry points under `frontend/src/app` and static assets under `public`; root npm/framework/Prisma/Vercel configuration remains in its required location. Shared documentation remains under `docs`. Added folder guides and shared VS Code Explorer exclusions/nesting to hide dependencies, build output, generated code, private `.local` storage and generated type files. Runtime data, backups and credentials were preserved. Automatic approval review blocked cache deletion (including an explicit retry for the two obsolete preview/test output directories), reporting only "blocked by policy"; those files remain hidden rather than being removed.
+
+Lint, TypeScript, Prisma validation, all 35 database/authentication/authorization/operational tests, the authenticated HTTP scenario, production build, four public smoke tests and the relocated backup/restore drill passed. All npm script file references exist and Git whitespace checks pass. Release check still intentionally rejects local development settings. Local production preview is running at http://127.0.0.1:3100; stop it before rebuilding in the same checkout. No commit, push or hosted deployment is part of this reorganization.
+
 - User authorized continuing across all phases without further phase approvals. This supersedes the former stop-at-phase-boundary note. Keep updates concise; do not use subagents.
 - Development now includes the customer/administrator/technician workflows through core phase 17 functionality: persisted requests, profiles, assignments/history, private photos, quote drafts/revisions/decisions, invoice snapshots, manual receipts/reversals, notifications, reviews/complaints, and real-data reports.
 - Request a Service now opens a real form and saves an owned request/reference for verified customers. Categories can receive requests for review while assignment remains blocked until administrator activation confirms coverage. Request intake is configurable.
@@ -22,7 +38,7 @@
 
 ## Owner policy decisions received
 
-See [owner decisions](owner-decisions.md) for the supplied policies and unresolved calculation details. The intended administrator is now known; hosting/domain details remain outstanding. Bootstrap found and fixed a PostgreSQL void-result decoding issue, covered by a new passing role/suspension regression test. The intended owner account must be registered and verified before provisioning. No administrator was granted. Invoice identity and IT-only coverage can then be applied with `npx tsx scripts/apply-owner-settings.ts`; this prepared script has not changed live settings. Seven operational tests passed after the fix. Policy-dependent work and browser acceptance remain open; earlier test totals are historical.
+See [owner decisions](owner-decisions.md) for the supplied policies and unresolved calculation details. The intended administrator is now known; hosting/domain details remain outstanding. Bootstrap found and fixed a PostgreSQL void-result decoding issue, covered by a new passing role/suspension regression test. The intended owner account must be registered and verified before provisioning. No administrator was granted. Invoice identity and IT-only coverage can then be applied with `npx tsx backend/scripts/apply-owner-settings.ts`; this prepared script has not changed live settings. Seven operational tests passed after the fix. Policy-dependent work and browser acceptance remain open; earlier test totals are historical.
 
 ## Confirmed owner policy implementation (2026-09-30)
 
