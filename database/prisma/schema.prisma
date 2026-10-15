@@ -1,0 +1,480 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CUSTOMER
+  TECHNICIAN
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum JobStatus {
+  REQUESTED
+  UNDER_REVIEW
+  TECHNICIAN_ASSIGNED
+  ACCEPTED
+  ASSESSING
+  AWAITING_QUOTE_APPROVAL
+  READY_TO_SCHEDULE
+  SCHEDULED
+  ON_THE_WAY
+  ARRIVED
+  IN_PROGRESS
+  AWAITING_CUSTOMER_CONFIRMATION
+  COMPLETED
+  CANCELLED
+  CLOSED
+}
+
+enum AssignmentStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  REPLACED
+  FINISHED
+  CANCELLED
+}
+
+enum AppointmentPurpose {
+  ASSESSMENT
+  WORK
+}
+
+enum AppointmentStatus {
+  PROPOSED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum NoteVisibility {
+  INTERNAL
+  CUSTOMER
+}
+
+model User {
+  emailVerified     Boolean             @default(false)
+  image             String?
+  auditEvents       AuditEvent[]
+  notifications     Notification[]
+  recordedPayments  Payment[]
+  approvedRefunds   JobRefund[]
+  uploadedPhotos    JobPhoto[]
+  technicianApplication TechnicianApplication?
+  documentDecisions JobDocument[]
+  ownedComplaints   Complaint[]
+  sessions          Session[]
+  accounts          Account[]
+  id                String              @id @default(uuid()) @db.Uuid
+  email             String              @unique @db.VarChar(254)
+  name              String              @db.VarChar(120)
+  phone             String?             @db.VarChar(32)
+  status            AccountStatus       @default(ACTIVE)
+  createdAt         DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime            @updatedAt @db.Timestamptz(3)
+  roles             UserRole[]
+  customerProfile   CustomerProfile?
+  technicianProfile TechnicianProfile?  @relation("TechnicianUser")
+  verifiedProfiles  TechnicianProfile[] @relation("Verifier")
+  assignedJobs      JobAssignment[]     @relation("AssignedBy")
+  historyEvents     JobStatusHistory[]
+  notes             JobNote[]
+  appointments      JobAppointment[]
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  token     String   @unique
+  expiresAt DateTime @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  ipAddress String?
+  userAgent String?
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(uuid()) @db.Uuid
+  accountId             String
+  providerId            String
+  userId                String    @db.Uuid
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  scope                 String?
+  password              String?
+  createdAt             DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(uuid()) @db.Uuid
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([identifier])
+}
+
+model RateLimit {
+  id          String @id @default(uuid()) @db.Uuid
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+}
+
+model UserRole {
+  userId    String   @db.Uuid
+  role      Role
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@id([userId, role])
+  @@index([role])
+}
+
+model CustomerProfile {
+  userId       String  @id @db.Uuid
+  businessName String? @db.VarChar(160)
+  user         User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  jobs         Job[]
+}
+
+model TechnicianProfile {
+  userId             String                  @id @db.Uuid
+  bio                String?                 @db.VarChar(2000)
+  isActive           Boolean                 @default(false)
+  verificationStatus VerificationStatus      @default(PENDING)
+  verifiedAt         DateTime?               @db.Timestamptz(3)
+  verifiedById       String?                 @db.Uuid
+  verificationEvidence Json?
+  user               User                    @relation("TechnicianUser", fields: [userId], references: [id], onDelete: Restrict)
+  verifiedBy         User?                   @relation("Verifier", fields: [verifiedById], references: [id], onDelete: Restrict)
+  skills             TechnicianSkill[]
+  serviceAreas       TechnicianServiceArea[]
+  assignments        JobAssignment[]
+
+  @@index([verifiedById])
+  @@index([verificationStatus, isActive])
+}
+
+model ServiceArea {
+  id          String                  @id @default(uuid()) @db.Uuid
+  slug        String                  @unique @db.VarChar(80)
+  name        String                  @db.VarChar(120)
+  countryCode String                  @db.Char(2)
+  timezone    String                  @db.VarChar(64)
+  isActive    Boolean                 @default(false)
+  createdAt   DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime                @updatedAt @db.Timestamptz(3)
+  technicians TechnicianServiceArea[]
+  jobs        Job[]
+}
+
+model ServiceCategory {
+  id          String            @id @default(uuid()) @db.Uuid
+  slug        String            @unique @db.VarChar(80)
+  name        String            @db.VarChar(120)
+  description String            @db.VarChar(1000)
+  isActive    Boolean           @default(false)
+  createdAt   DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime          @updatedAt @db.Timestamptz(3)
+  applications TechnicianApplication[]
+  technicians TechnicianSkill[]
+  jobs        Job[]
+}
+
+model TechnicianSkill {
+  technicianId String            @db.Uuid
+  categoryId   String            @db.Uuid
+  technician   TechnicianProfile @relation(fields: [technicianId], references: [userId], onDelete: Restrict)
+  category     ServiceCategory   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@id([technicianId, categoryId])
+  @@index([categoryId])
+}
+
+model TechnicianServiceArea {
+  technicianId  String            @db.Uuid
+  serviceAreaId String            @db.Uuid
+  technician    TechnicianProfile @relation(fields: [technicianId], references: [userId], onDelete: Restrict)
+  serviceArea   ServiceArea       @relation(fields: [serviceAreaId], references: [id], onDelete: Restrict)
+
+  @@id([technicianId, serviceAreaId])
+  @@index([serviceAreaId])
+}
+
+model Job {
+  id            String             @id @default(uuid()) @db.Uuid
+  reference     Int                @unique @default(autoincrement())
+  customerId    String             @db.Uuid
+  categoryId    String             @db.Uuid
+  serviceAreaId String             @db.Uuid
+  description   String             @db.VarChar(5000)
+  preferredAt   DateTime?          @db.Timestamptz(3)
+  status        JobStatus          @default(REQUESTED)
+  version       Int                @default(0)
+  completedNotifiedAt DateTime?     @db.Timestamptz(3)
+  reworkUntil   DateTime?           @db.Timestamptz(3)
+  reworkActive  Boolean             @default(false)
+  retentionReason String?           @db.VarChar(1000)
+  requestKey    String             @unique @db.Uuid
+  createdAt     DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime           @updatedAt @db.Timestamptz(3)
+  customer      CustomerProfile    @relation(fields: [customerId], references: [userId], onDelete: Restrict)
+  category      ServiceCategory    @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  serviceArea   ServiceArea        @relation(fields: [serviceAreaId], references: [id], onDelete: Restrict)
+  notifications Notification[]
+  documents     JobDocument[]
+  review        JobReview?
+  complaints    Complaint[]
+  photos        JobPhoto[]
+  location      JobLocation?
+  assignments   JobAssignment[]
+  history       JobStatusHistory[]
+  notes         JobNote[]
+  appointments  JobAppointment[]
+
+  @@index([customerId, createdAt])
+  @@index([status, createdAt])
+  @@index([categoryId])
+  @@index([serviceAreaId])
+}
+
+// Snapshot at submission; never reuse a mutable customer address as this record.
+model JobLocation {
+  jobId        String  @id @db.Uuid
+  addressLine  String  @db.VarChar(300)
+  locality     String  @db.VarChar(120)
+  directions   String? @db.VarChar(1000)
+  contactName  String  @db.VarChar(120)
+  contactPhone String  @db.VarChar(32)
+  job          Job     @relation(fields: [jobId], references: [id], onDelete: Restrict)
+}
+
+model JobAssignment {
+  id           String            @id @default(uuid()) @db.Uuid
+  jobId        String            @db.Uuid
+  technicianId String            @db.Uuid
+  assignedById String            @db.Uuid
+  status       AssignmentStatus  @default(PENDING)
+  assignedAt   DateTime          @default(now()) @db.Timestamptz(3)
+  respondedAt  DateTime?         @db.Timestamptz(3)
+  endedAt      DateTime?         @db.Timestamptz(3)
+  reason       String?           @db.VarChar(1000)
+  job          Job               @relation(fields: [jobId], references: [id], onDelete: Restrict)
+  technician   TechnicianProfile @relation(fields: [technicianId], references: [userId], onDelete: Restrict)
+  assignedBy   User              @relation("AssignedBy", fields: [assignedById], references: [id], onDelete: Restrict)
+
+  @@index([jobId, assignedAt])
+  @@index([technicianId, status])
+  @@index([assignedById])
+}
+
+model JobStatusHistory {
+  id         String     @id @default(uuid()) @db.Uuid
+  jobId      String     @db.Uuid
+  actorId    String     @db.Uuid
+  fromStatus JobStatus?
+  toStatus   JobStatus
+  reason     String?    @db.VarChar(1000)
+  createdAt  DateTime   @default(now()) @db.Timestamptz(3)
+  job        Job        @relation(fields: [jobId], references: [id], onDelete: Restrict)
+  actor      User       @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([jobId, createdAt])
+  @@index([actorId])
+}
+
+model JobNote {
+  id         String         @id @default(uuid()) @db.Uuid
+  jobId      String         @db.Uuid
+  authorId   String         @db.Uuid
+  body       String         @db.VarChar(5000)
+  visibility NoteVisibility @default(INTERNAL)
+  createdAt  DateTime       @default(now()) @db.Timestamptz(3)
+  job        Job            @relation(fields: [jobId], references: [id], onDelete: Restrict)
+  author     User           @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([jobId, createdAt])
+  @@index([authorId])
+}
+
+model JobAppointment {
+  id          String             @id @default(uuid()) @db.Uuid
+  jobId       String             @db.Uuid
+  createdById String             @db.Uuid
+  purpose     AppointmentPurpose
+  status      AppointmentStatus  @default(PROPOSED)
+  startsAt    DateTime           @db.Timestamptz(3)
+  endsAt      DateTime           @db.Timestamptz(3)
+  createdAt   DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime           @updatedAt @db.Timestamptz(3)
+  job         Job                @relation(fields: [jobId], references: [id], onDelete: Restrict)
+  createdBy   User               @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([jobId, startsAt])
+  @@index([status, startsAt])
+  @@index([createdById])
+}
+
+model JobDocument {
+  id        String   @id @default(uuid()) @db.Uuid
+  jobId     String   @db.Uuid
+  kind      String   @db.VarChar(24)
+  revision  Int
+  status    String   @db.VarChar(24)
+  currency  String   @db.Char(3)
+  total     Int
+  lines     Json
+  scope     String   @db.Text
+  issuerSnapshot Json?
+  technicianSnapshot String? @db.VarChar(160)
+  expiresAt DateTime? @db.Timestamptz(3)
+  decidedAt DateTime? @db.Timestamptz(3)
+  decidedBy String?  @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Restrict)
+  decidedByUser User? @relation(fields: [decidedBy], references: [id], onDelete: Restrict)
+  payments  Payment[]
+  refund    JobRefund?
+  @@unique([jobId, kind, revision])
+}
+
+model JobRefund {
+  id           String   @id @default(uuid()) @db.Uuid
+  documentId   String   @unique @db.Uuid
+  operationId  String   @unique @db.Uuid
+  paidSnapshot Int
+  excludedPaid Int
+  eligiblePaid Int
+  amount       Int
+  creditAmount Int
+  reason       String   @db.VarChar(2000)
+  excludedCosts String  @db.VarChar(2000)
+  approvedById String   @db.Uuid
+  approvedAt   DateTime @default(now()) @db.Timestamptz(3)
+  paidAt       DateTime? @db.Timestamptz(3)
+  method       String?  @db.VarChar(32)
+  reference    String?  @db.VarChar(160)
+  document JobDocument @relation(fields: [documentId], references: [id], onDelete: Restrict)
+  approvedBy User @relation(fields: [approvedById], references: [id], onDelete: Restrict, onUpdate: NoAction)
+}
+
+model Payment {
+  id          String   @id @default(uuid()) @db.Uuid
+  documentId  String   @db.Uuid
+  operationId String   @unique @db.Uuid
+  amount      Int
+  currency    String   @db.Char(3)
+  method      String   @db.VarChar(32)
+  reference   String   @db.VarChar(160)
+  actorId     String   @db.Uuid
+  receivedAt  DateTime @db.Timestamptz(3)
+  reversedAt  DateTime? @db.Timestamptz(3)
+  reason      String?  @db.VarChar(1000)
+  actor       User @relation(fields: [actorId], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "Payment_actor")
+  document    JobDocument @relation(fields: [documentId], references: [id], onDelete: Restrict)
+}
+
+model AuditEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  actorId   String   @db.Uuid
+  action    String   @db.VarChar(80)
+  targetId  String   @db.VarChar(120)
+  detail    String   @db.VarChar(2000)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  actor User @relation(fields: [actorId], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "AuditEvent_actor")
+  @@index([targetId, createdAt])
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  jobId     String?  @db.Uuid
+  message   String   @db.VarChar(500)
+  readAt    DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "Notification_user")
+  job Job? @relation(fields: [jobId], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "Notification_job")
+  @@index([userId, createdAt])
+}
+
+model JobReview {
+  jobId      String   @id @db.Uuid
+  rating     Int
+  body       String   @db.VarChar(2000)
+  hidden     Boolean  @default(false)
+  reason     String?  @db.VarChar(1000)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  job        Job      @relation(fields: [jobId], references: [id], onDelete: Restrict)
+}
+
+model Complaint {
+  id         String   @id @default(uuid()) @db.Uuid
+  jobId      String   @db.Uuid
+  body       String   @db.VarChar(5000)
+  status     String   @default("OPEN") @db.VarChar(24)
+  resolution String?  @db.VarChar(5000)
+  ownerId    String?  @db.Uuid
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  resolvedAt DateTime? @db.Timestamptz(3)
+  job        Job      @relation(fields: [jobId], references: [id], onDelete: Restrict)
+  owner User? @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  @@index([jobId, status])
+}
+
+model JobPhoto {
+  id         String   @id @default(uuid()) @db.Uuid
+  jobId      String   @db.Uuid
+  uploaderId String   @db.Uuid
+  bytes      Bytes
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  job        Job      @relation(fields: [jobId], references: [id], onDelete: Restrict)
+  uploader User @relation(fields: [uploaderId], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "JobPhoto_uploader")
+  @@index([jobId])
+}
+
+model BusinessSetting {
+  key       String   @id @db.VarChar(80)
+  value     String   @db.VarChar(2000)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model TechnicianApplication {
+  userId    String   @id @db.Uuid
+  bio       String   @db.VarChar(2000)
+  categoryId String  @db.Uuid
+  phone     String   @db.VarChar(32)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "TechnicianApplication_user")
+  category ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "TechnicianApplication_category")
+  status    String   @default("PENDING") @db.VarChar(24)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+}

@@ -1,0 +1,8 @@
+import Link from "next/link";
+import Image from "next/image";
+import { photoFor } from "@/shared/data/photography";
+type RequestRow = {id:string;reference:number;description:string;status:string;category:{name:string};appointments:{startsAt:Date}[]};
+export function AdminRequests({jobs}:{jobs:RequestRow[]}) {
+  if (!jobs.length) return <div className="admin-empty"><Image className="empty-state-photo" src={photoFor("coordination").src} alt={photoFor("coordination").alt} width={400} height={240} sizes="(max-width: 680px) 80vw, 360px" /><h3>Your request queue is clear</h3><p>New customer requests will appear here for review and assignment.</p><Link href="/request-service">Open the service request form &rarr;</Link></div>;
+  return <div className="table-scroll"><table className="admin-request-table"><caption className="sr-only">Customer service requests</caption><thead><tr><th>Request / service</th><th>Status</th><th>Appointment (CAT)</th><th><span className="sr-only">Actions</span></th></tr></thead><tbody>{jobs.map(job=><tr key={job.id}><td><Link href={"/jobs/"+job.id}><strong>FF-{job.reference}</strong> {job.category.name}</Link><p>{job.description.slice(0,110)}</p></td><td><span className="status-label" data-status={job.status}>{job.status.toLowerCase().replaceAll("_"," ")}</span></td><td>{job.appointments[0] ? new Intl.DateTimeFormat("en-ZW",{timeZone:"Africa/Harare",dateStyle:"medium",timeStyle:"short"}).format(job.appointments[0].startsAt) : "Not scheduled"}</td><td><Link className="admin-open" href={"/jobs/"+job.id} aria-label={"Open request FF-"+job.reference}>Open &rarr;</Link></td></tr>)}</tbody></table></div>;
+}

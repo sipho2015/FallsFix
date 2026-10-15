@@ -7,30 +7,43 @@
   },
   "packageManager": "npm@11.13.0",
   "scripts": {
-    "dev": "next dev --hostname 127.0.0.1",
-    "build": "prisma generate && next build",
-    "start": "next start --hostname 127.0.0.1",
+    "predev": "prisma generate",
+    "dev": "next dev frontend --hostname 127.0.0.1",
+    "build": "prisma generate && next build frontend",
+    "start": "next start frontend --hostname 127.0.0.1",
     "lint": "eslint . --max-warnings=0",
-    "typecheck": "prisma generate && next typegen && tsc --noEmit",
+    "typecheck": "prisma generate && next typegen frontend && tsc --noEmit",
     "check": "npm run lint && npm run typecheck",
-    "test:smoke": "node --test tests/public-site.test.mjs",
+    "test:smoke": "node --test frontend/tests/public-site.test.mjs",
+    "auth:setup": "node backend/scripts/setup-auth.mjs",
+    "test:auth": "prisma generate && tsx database/scripts/prepare-test-database.ts && tsx --test backend/tests/auth.test.ts",
+    "test:auth:http": "prisma generate && tsx database/scripts/prepare-test-database.ts && tsx --test backend/tests/auth-http.test.ts",
+    "test:authorization": "prisma generate && tsx database/scripts/prepare-test-database.ts && tsx --test backend/tests/authorization.test.ts",
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:deploy": "prisma migrate deploy",
     "db:migrate": "prisma migrate dev",
     "db:status": "prisma migrate status",
     "db:seed": "prisma db seed",
-    "test:database": "prisma generate && tsx scripts/prepare-test-database.ts && tsx --test tests/database.test.ts"
+    "test:database": "prisma generate && tsx database/scripts/prepare-test-database.ts && tsx --test database/tests/database.test.ts",
+    "test:operations": "prisma generate && tsx database/scripts/prepare-test-database.ts && tsx --test backend/tests/operations.test.ts",
+    "admin:bootstrap": "tsx backend/scripts/bootstrap-admin.ts",
+    "db:restore-drill": "tsx database/scripts/restore-drill.ts",
+    "release:check": "tsx vercel/scripts/check-release.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "7.10.0",
+    "better-auth": "1.7.6",
     "dotenv": "18.0.4",
-    "next": "16.3.6",
+    "next": "16.3.8",
+    "nodemailer": "10.0.12",
     "pg": "8.23.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "server-only": "0.0.1"
+    "server-only": "0.0.1",
+    "sharp": "0.35.5",
+    "zod": "4.6.5"
   },
   "overrides": {
     "@prisma/config": {
@@ -43,15 +56,19 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "24.19.0",
+    "@types/nodemailer": "8.0.2",
     "@types/pg": "8.23.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "eslint": "9.39.5",
-    "eslint-config-next": "16.3.6",
+    "eslint-config-next": "16.3.8",
     "postcss": "8.5.28",
     "prisma": "7.10.0",
     "tailwindcss": "4.3.3",
     "tsx": "4.23.15",
     "typescript": "5.9.3"
-  }
+  },
+  "workspaces": [
+    "frontend"
+  ]
 }

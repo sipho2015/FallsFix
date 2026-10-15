@@ -1,6 +1,6 @@
 # Database foundation — Phase 4
 
-FallsFix uses PostgreSQL with Prisma ORM 7.10.0 and the PostgreSQL driver adapter. PostgreSQL stores related records and enforces foreign keys and constraints. Prisma generates typed queries from `prisma/schema.prisma`; migrations are reviewed SQL files that recreate the structure on another database. The public website still uses editorial categories and does not require a live database.
+FallsFix uses PostgreSQL with Prisma ORM 7.10.0 and the PostgreSQL driver adapter. PostgreSQL stores related records and enforces foreign keys and constraints. Prisma generates typed queries from `database/prisma/schema.prisma`; migrations are reviewed SQL files that recreate the structure on another database. The public website still uses editorial categories and does not require a live database.
 
 ## Implemented scope
 
@@ -64,7 +64,7 @@ From the repository root:
 
 ```powershell
 npm ci
-./scripts/start-local-db.ps1
+./database/scripts/start-local-db.ps1
 npm run db:generate
 npm run db:deploy
 npm run db:seed
@@ -79,7 +79,7 @@ Stop this project-owned cluster when needed:
 & 'C:\Program Files\PostgreSQL\18\bin\pg_ctl.exe' -D '.local/postgres' -m fast -w stop
 ```
 
-Restart it with `./scripts/start-local-db.ps1`. This is a local development process, not an installed service or production deployment. Do not expose this local cluster to a network. Do not delete `.local/postgres` if you need its data.
+Restart it with `./database/scripts/start-local-db.ps1`. This is a local development process, not an installed service or production deployment. Do not expose this local cluster to a network. Do not delete `.local/postgres` if you need its data.
 
 ## Existing PostgreSQL server or another operating system
 
@@ -107,11 +107,11 @@ Prisma CLI/scripts load `.env` through dotenv; Next.js loads its standard enviro
 | `npm run db:seed` | Add inactive reference area/categories without overwriting edits; refused with NODE_ENV=production |
 | `npm run test:database` | Apply committed migrations to the dedicated test database, then run integration tests |
 
-The seed runs explicitly. Repeating it adds no duplicate categories and does not re-enable or overwrite existing records. It creates no customers, technicians, administrator passwords, jobs, or prices. Its reference category names originate from `data/services.ts`; the public UI does not yet query these tables.
+The seed runs explicitly. Repeating it adds no duplicate categories and does not re-enable or overwrite existing records. It creates no customers, technicians, administrator passwords, jobs, or prices. Its reference category names originate from `frontend/shared/data/services.ts`; the public UI does not yet query these tables.
 
 ## Server/client separation
 
-Future Next.js server operations should import `getDatabase()` from `lib/database/db.ts`. The `server-only` marker rejects use from a browser component. Lazy singleton creation avoids repeated connection pools during development and avoids touching the database when only public pages are built. The lower-level client factory is for trusted server/CLI code, not public routes. No database object or environment value is passed to client components.
+Future Next.js server operations should import `getDatabase()` from `database/client/db.ts`. The `server-only` marker rejects use from a browser component. Lazy singleton creation avoids repeated connection pools during development and avoids touching the database when only public pages are built. The lower-level client factory is for trusted server/CLI code, not public routes. No database object or environment value is passed to client components.
 
 ## Tests and verification
 
@@ -124,6 +124,8 @@ Phase 4 results: schema validation and client generation passed; the migration a
 Additional checks confirmed zero users/jobs and only inactive reference rows in development, no persisted test fixtures, and no database passwords in public build assets. Public homepage/category-preview requests succeeded while the project database was stopped; the helper restarted it successfully. Client generation also succeeded with database variables absent and dotenv loading disabled for that subprocess.
 
 ## Production boundary
+
+Phase 5 adds email verification state, library-managed Account/Session/Verification/RateLimit tables, and an atomic credential-customer provisioning trigger in a separate migration. See [authentication](authentication.md) for their responsibilities and additional tests. Historical Phase 4 checks above describe the earlier core-only schema; they do not replace Phase 5 verification.
 
 No hosted database, backup policy, restore drill, production credentials, or deployment is configured. The local owner role is suitable for development migrations, not the final least-privilege production application identity. Separate migration and runtime roles, configure trusted TLS/pooling, establish backup/restore procedures, and review security and authorization before real data collection.
 

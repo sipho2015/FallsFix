@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -13,9 +17,47 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [{ "name": "next" }],
-    "paths": { "@/*": ["./*"] }
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/frontend/*": [
+        "./frontend/*"
+      ],
+      "@/shared/*": [
+        "./frontend/shared/*"
+      ],
+      "@/backend/database/*": [
+        "./database/client/*"
+      ],
+      "@/backend/*": [
+        "./backend/*"
+      ],
+      "@/app/*": [
+        "./frontend/src/app/*"
+      ]
+    }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "frontend/next-env.d.ts",
+    "frontend/**/*.ts",
+    "frontend/**/*.tsx",
+    "backend/**/*.ts",
+    "database/**/*.ts",
+    "vercel/**/*.ts",
+    "prisma.config.ts",
+    "frontend/.next/types/**/*.ts",
+    "frontend/.next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/.local",
+    "database/generated",
+    "frontend/.next-auth-test",
+    ".next",
+    ".next-auth-test",
+    ".next-production"
+  ]
 }

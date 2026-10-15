@@ -5,13 +5,36 @@ import nextTypeScript from "eslint-config-next/typescript";
 export default defineConfig([
   ...nextVitals,
   ...nextTypeScript,
+  { settings: { next: { rootDir: "frontend/" } } },
+  {
+    files: ["frontend/components/**/*.{ts,tsx}", "frontend/shared/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: [{
+        group: ["@/backend/**", "**/backend/**", "**/generated/**", "@/app/**"],
+        message: "Keep UI and shared code independent of backend/database modules. Use shared schemas or an API boundary.",
+      }] }],
+    },
+  },
+  {
+    files: ["backend/auth/**/*.{ts,tsx}", "backend/authorization/**/*.{ts,tsx}", "backend/operations/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: [{
+        group: ["@/frontend/**", "**/frontend/**", "@/app/**"],
+        message: "Business logic must not depend on UI or route entry points.",
+      }] }],
+    },
+  },
   globalIgnores([
     ".next/**",
+    ".next-*/**",
+    "frontend/.next/**",
+    "frontend/.next-*/**",
     "out/**",
     "dist/**",
     "coverage/**",
-    "generated/**",
+    "database/generated/**",
     ".local/**",
     "next-env.d.ts",
+    "frontend/next-env.d.ts",
   ]),
 ]);

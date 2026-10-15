@@ -2,10 +2,10 @@ import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
 export default defineConfig({
-  schema: "prisma/schema.prisma",
+  schema: "database/prisma/schema.prisma",
   migrations: {
-    path: "prisma/migrations",
-    seed: "tsx prisma/seed.ts",
+    path: "database/prisma/migrations",
+    seed: "tsx database/prisma/seed.ts",
   },
   // Generation and public-site builds do not require a live database.
   datasource: {
