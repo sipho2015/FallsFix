@@ -1,3 +1,6 @@
+// Set only by the public frontend proxy, from its trusted ingress IP header.
+export const INTERNAL_CLIENT_IP_HEADER = "x-fallsfix-proxy-client-ip";
+
 export type AuthConfig = {
   origin: string;
   secret: string;

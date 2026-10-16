@@ -28,7 +28,7 @@ node --version
 npm --version
 ```
 
-There is no GitHub remote yet. After a remote is deliberately created, document its actual clone URL here. Run `npm ci` then `npm run dev` from the repository directory and open http://127.0.0.1:3000. Stop with Ctrl+C before building. Use `npm run dev -- --port 3001` if necessary.
+The repository is connected to `sipho2015/FallsFix`. Run `npm ci` then `npm run dev` from the repository directory and open http://127.0.0.1:3000. This starts both Next.js services through the pinned Vercel CLI (`vercel dev -L`) and injects the internal binding automatically; no Vercel login is required. Stop with Ctrl+C before building. Use `npm run dev -- --listen 127.0.0.1:3001` to select another public port, and set the local authentication/site origins to match. Do not set `BACKEND_URL` yourself.
 
 The public website runs without environment values. Database commands require the variables in `.env.example`; follow [database setup](database.md) to generate local credentials or configure an existing server. Storage remains a later phase. Do not print or commit actual connection URLs.
 

@@ -1,6 +1,7 @@
 import { apiIdentity, apiError, boundedBody, json } from "@/backend/operations/http";
 import { getDatabase } from "@/backend/database/db";
 import { executeOperation, OperationError } from "@/backend/operations/service";
+export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     const userId = await apiIdentity(request, true);

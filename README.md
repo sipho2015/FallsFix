@@ -12,7 +12,9 @@ FallsFix coordinates local service requests in Victoria Falls, Zimbabwe. The app
 | [vercel](vercel/README.md) | Production release checks and hosting guidance |
 | [.github](.github/README.md) | GitHub automation |
 
-`frontend/src/app` holds Next.js routes and API entry points; `frontend/public` holds public assets. Next.js/PostCSS/Vercel configuration lives inside `frontend`; root npm, TypeScript, lint and Prisma configuration coordinates the complete application. `docs` holds shared business and operational documentation. This is one integrated application, not five separate deployable services. Run npm commands from the repository root; existing command names are unchanged. Vercel's project Root Directory must now be **frontend**, with files outside that directory included in the build.
+`frontend/src/app` holds pages and the public `/api/*` proxy; `frontend/public` holds public assets. `backend/src/app/api` holds the actual API handlers. The root `vercel.json` deploys two Next.js services: public `frontend` and internal `backend`. The frontend calls the backend through Vercel's runtime `BACKEND_URL` binding; browser URLs remain unchanged. Server-rendered pages still import the shared backend/database modules directly. PostgreSQL is an external managed database, not a Vercel service. `docs` holds shared business and operational documentation.
+
+Run npm commands from the repository root. Vercel's project Root Directory must be the **repository root (`.`)** so it reads the root services configuration. This supersedes the previous `frontend` Root Directory setting. See [Vercel setup](docs/vercel.md).
 
 VS Code hides generated output, dependencies and private `.local` storage using the checked-in Explorer settings. The local database, backups and credentials are preserved. Build caches can be regenerated and are not source code.
 
@@ -38,6 +40,8 @@ npm run db:seed
 npm run dev
 ```
 
+`npm run dev` runs the pinned Vercel CLI with `vercel dev -L`, which starts both services and generates the binding automatically without account linking. The first run downloads the CLI if it is not cached. Open http://127.0.0.1:3000. Do not set `BACKEND_URL` manually. `dev:frontend` and `dev:backend` are service commands used by Vercel; running just the frontend does not start the API.
+
 Seeded categories require administrator activation before technician assignment. Requests can be submitted for review before activation. See [development setup](docs/development.md) and [authentication](docs/authentication.md).
 
 ## Validation
@@ -52,7 +56,7 @@ npm run test:auth:http
 npm run build
 ```
 
-Tests use a separate local database. Run the database suites sequentially, then the HTTP suite before the production build: Next.js regenerates shared type files. Public smoke tests require a running server and `TEST_BASE_URL`. Production configuration is checked with `npm run release:check`, including the canonical site/authentication origin and PostgreSQL URL; local development settings intentionally fail that gate.
+Tests use a separate local database. Run the database suites sequentially, then the HTTP suite before the production build: Next.js regenerates shared type files. The HTTP suite starts both services through `vercel dev -L`. `npm run build` builds both apps; Vercel builds each independently through `build:frontend` and `build:backend`. Public smoke tests require a running server and `TEST_BASE_URL`. `npm start` remains a frontend-only Next.js production diagnostic; use `npm run dev` to exercise both services locally. Production configuration is checked with `npm run release:check`, including the canonical site/authentication origin and PostgreSQL URL; local development settings intentionally fail that gate.
 
 ## Project references
 

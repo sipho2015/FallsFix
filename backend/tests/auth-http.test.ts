@@ -22,7 +22,7 @@ async function assertLoginRedirect(response: Response) {
   }
 }
 
-test("Next.js serves registration, verification mail, protected account and logout", { timeout: 180000 }, async () => {
+test("Vercel services proxy registration, verification mail, private uploads and protected accounts", { timeout: 240000 }, async () => {
   const databaseUrl = getTestDatabaseUrl();
   const database = createDatabaseClient(databaseUrl);
   const origin = "http://127.0.0.1:3217";
@@ -33,7 +33,8 @@ test("Next.js serves registration, verification mail, protected account and logo
   let initialMail: string[] = [];
   try { initialMail = await readdir(outbox); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
-  const server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "dev", "frontend", "--hostname", "127.0.0.1", "--port", "3217"], {
+  assert.ok(process.env.npm_execpath, "Run this scenario with npm run test:auth:http");
+  const server = spawn(process.execPath, [process.env.npm_execpath, "exec", "--yes", "--prefer-offline", "--package=vercel@64.0.2", "--", "vercel", "dev", "-L", "--listen", "127.0.0.1:3217"], {
     windowsHide: true,
     // Discard request logs, which may contain the private verification URL.
     stdio: "ignore",
@@ -47,13 +48,17 @@ test("Next.js serves registration, verification mail, protected account and logo
   try {
     let ready = false;
     for (let attempt = 0; attempt < 90; attempt++) {
-      assert.equal(server.exitCode, null, "The isolated Next server exited before becoming ready; stop any dev server using this checkout.");
+      assert.equal(server.exitCode, null, "The isolated Vercel services exited before becoming ready; stop any dev server using this checkout.");
       try { ready = (await fetch(`${origin}/login`, { signal: AbortSignal.timeout(1000) })).ok; }
       catch { /* Wait for initial compilation. */ }
       if (ready) break;
       await delay(500);
     }
-    assert.ok(ready, "The isolated Next server must be ready");
+    assert.ok(ready, "The isolated Vercel services must be ready");
+    const health = await fetch(origin + "/api/health");
+    assert.equal(health.status, 200, "Health must reach the internal backend through the binding");
+    assert.deepEqual(await health.json(), { status: "ok" });
+    assert.equal((await fetch(origin + "/api/does-not-exist")).status, 404);
     const anonymous = await fetch(`${origin}/account`, { redirect: "manual" });
     await assertLoginRedirect(anonymous);
     await assertLoginRedirect(await fetch(`${origin}/portal/admin`, { redirect: "manual" }));
@@ -73,9 +78,14 @@ test("Next.js serves registration, verification mail, protected account and logo
     assert.ok(verificationUrl, "Next after() must write the local verification email");
     const verified = await fetch(verificationUrl, { redirect: "manual", headers: { "x-test-client": clientIp } });
     assert.equal(verified.status, 302);
-    const login = await post("sign-in/email", { email: address, password });
+    const login = await fetch(origin + "/api/auth/sign-in/email", {
+      method: "POST", headers: { origin, "content-type": "application/json", "x-test-client": clientIp,
+        "x-fallsfix-proxy-client-ip": "192.0.2.99" }, body: JSON.stringify({ email: address, password }),
+    });
     assert.equal(login.status, 200);
     assert.deepEqual(await login.json(), { success: true });
+    const storedSession = await database.session.findFirstOrThrow({ where: { user: { email: address } } });
+    assert.equal(storedSession.ipAddress, clientIp, "Frontend must replace spoofed internal IP headers with the trusted ingress IP");
     const cookie = login.headers.getSetCookie().map((value) => value.split(";")[0]).join("; ");
     const account = await fetch(`${origin}/account`, { headers: { cookie } });
     assert.equal(account.status, 200);

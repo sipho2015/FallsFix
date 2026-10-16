@@ -56,6 +56,9 @@
     "**/.local",
     "database/generated",
     "frontend/.next-auth-test",
+    "backend/.next",
+    "backend/.next-*",
+    "backend/next-env.d.ts",
     ".next",
     ".next-auth-test",
     ".next-production"
