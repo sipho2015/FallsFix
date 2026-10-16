@@ -3,6 +3,7 @@ import { getDatabase } from "@/backend/database/db";
 import { readAuthorizedJob } from "@/backend/authorization/policy";
 import { OperationError } from "@/backend/operations/service";
 import { z } from "zod";
+export const runtime = "nodejs";
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await apiIdentity(request), { id } = await params;

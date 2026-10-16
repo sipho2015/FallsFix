@@ -48,6 +48,6 @@ jobs:
       - run: npm run test:auth:http
       - run: npm run build
       - run: |
-          npm start -- --port 3100 > /tmp/fallsfix.log 2>&1 &
+          npx --yes --prefer-offline vercel@64.0.2 dev -L --listen 127.0.0.1:3100 > /tmp/fallsfix.log 2>&1 &
           for attempt in $(seq 1 30); do curl --fail http://127.0.0.1:3100/ >/dev/null 2>&1 && break; sleep 1; done
           npm run test:smoke

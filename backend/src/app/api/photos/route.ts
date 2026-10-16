@@ -4,6 +4,7 @@ import { readAuthorizedJob } from "@/backend/authorization/policy";
 import { OperationError } from "@/backend/operations/service";
 import { normalizePhoto } from "@/backend/operations/photos";
 import { MAX_PHOTO_BYTES } from "@/shared/validation/photos";
+export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     const userId = await apiIdentity(request, true);

@@ -8,11 +8,15 @@
   "packageManager": "npm@11.13.0",
   "scripts": {
     "predev": "prisma generate",
-    "dev": "next dev frontend --hostname 127.0.0.1",
-    "build": "prisma generate && next build frontend",
+    "dev": "npx --yes --prefer-offline vercel@64.0.2 dev -L --listen 127.0.0.1:3000",
+    "dev:frontend": "next dev frontend --hostname 127.0.0.1",
+    "dev:backend": "next dev backend --hostname 127.0.0.1",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "prisma generate && next build frontend",
+    "build:backend": "prisma generate && next build backend",
     "start": "next start frontend --hostname 127.0.0.1",
     "lint": "eslint . --max-warnings=0",
-    "typecheck": "prisma generate && next typegen frontend && tsc --noEmit",
+    "typecheck": "prisma generate && next typegen frontend && next typegen backend && tsc --noEmit && tsc --noEmit --project backend/tsconfig.json",
     "check": "npm run lint && npm run typecheck",
     "test:smoke": "node --test frontend/tests/public-site.test.mjs",
     "auth:setup": "node backend/scripts/setup-auth.mjs",
@@ -69,6 +73,7 @@
     "typescript": "5.9.3"
   },
   "workspaces": [
-    "frontend"
+    "frontend",
+    "backend"
   ]
 }
